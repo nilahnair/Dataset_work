@@ -45,7 +45,8 @@ def process_file(file_path):
     with open(file_path, 'r') as txtfile:
         spamreader = csv.reader(txtfile, delimiter=';')
         for row in spamreader:
-            print(row.strip())
+            print(row)
+            print(row[0])
             
             res = []
             for elem in row.split(','):
