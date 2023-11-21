@@ -74,7 +74,7 @@ def process_file(file_path, subject_id):
     return segments
 
 def process_subject(subject_id):
-    print(f'Processing subject {subject_id}...')
+    print('Processing subject', subject_id)
     subject_dir = os.path.join(DATA_DIR, subject_id)
     file_list = os.listdir(subject_dir)
     all_segments = []
