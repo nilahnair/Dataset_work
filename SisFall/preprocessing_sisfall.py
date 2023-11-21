@@ -148,7 +148,7 @@ def split_and_save_data(X, y):
         valid_data.to_csv('Sis_valid_data.csv', index=False)
         test_data.to_csv('Sis_test_data.csv', index=False)
     except Exception as e:
-        print(f"Error in split_and_save_data: {e}")
+        print("Error in split_and_save_data:")
 
 
 def main():
