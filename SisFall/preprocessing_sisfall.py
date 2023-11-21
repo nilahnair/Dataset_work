@@ -47,6 +47,7 @@ def process_file(file_path):
         for row in spamreader:
             print(row)
             print(row[0])
+            print(row[0].strip())
             
             res = []
             for elem in row.split(','):
