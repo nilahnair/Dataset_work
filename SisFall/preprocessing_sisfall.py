@@ -45,7 +45,7 @@ def process_file(file_path):
     with open(file_path, 'r') as txtfile:
         spamreader = csv.reader(txtfile, delimiter=';')
         for row in spamreader:
-            sensor_data.append(list(float(idx) for idy in row.split(',')))
+            sensor_data.append([float(idx) for idx in row.split(',')])
         print(sensor_data)
         '''
         for i in range(0, len(chunk) - WINDOW_SIZE + 1, STRIDE):
