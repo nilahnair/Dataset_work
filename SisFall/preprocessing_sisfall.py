@@ -30,7 +30,7 @@ def get_person_info(subject_id):
     person_list = []
     for s in strings:
         print('subject_id',s)
-        if re.match(f'^\| {subject_id}', s):   
+        if re.match('^\| {subject_id}', s):   
             temp = s.split('|')
             temp = [x.strip() for x in temp]
             if len(temp) == 7:
