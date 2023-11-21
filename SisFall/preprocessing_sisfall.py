@@ -1,65 +1,52 @@
 import re
 import os
 import gc
+
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.model_selection import train_test_split
 from multiprocessing import Pool
 
+import csv
 
 
 # Configuration Parameters
 DATA_DIR = '/vol/actrec/SisFall_dataset/' 
 README_FILE_PATH = os.path.join(DATA_DIR, 'Readme.txt')
-SUBJECT_IDS = ['SA01', 'SA02', 'SA03', 'SA04', 'SA05', 'SA06', 'SA07', 'SA08', 'SA09', 'SA10', 'SA11', 'SA12', 
+SUBJECT= ['SA01', 'SA02', 'SA03', 'SA04', 'SA05', 'SA06', 'SA07', 'SA08', 'SA09', 'SA10', 'SA11', 'SA12', 
                'SA13', 'SA14', 'SA15', 'SA16', 'SA17', 'SA18', 'SA19', 'SA20', 'SA21', 'SA22', 'SA23', 'SE01', 'SE02',
                'SE03', 'SE04', 'SE05', 'SE06', 'SE07', 'SE08', 'SE09', 'SE10', 'SE11', 'SE12', 'SE13', 'SE14', 'SE15']
+Subject_id= {'SA01':0, 'SA02':1, 'SA03':2, 'SA04':3, 'SA05':4, 'SA06':5, 'SA07':6, 'SA08':7, 'SA09':8, 'SA10':9, 'SA11':10, 'SA12':11, 
+               'SA13':12, 'SA14':13, 'SA15':14, 'SA16':15, 'SA17':16, 'SA18':17, 'SA19':18, 'SA20':19, 'SA21':20, 'SA22':21, 'SA23':22, 'SE01':23, 'SE02':24,
+               'SE03':25, 'SE04':26, 'SE05':27, 'SE06':28, 'SE07':29, 'SE08':30, 'SE09':31, 'SE10':32, 'SE11':33, 'SE12':34, 'SE13':35, 'SE14':36, 'SE15':37}
 WINDOW_SIZE = 200
 STRIDE = 50
 SOFT_BIOMETRICS = ['age', 'height', 'weight', 'gender']
+sensor_cols = ['ADXL345_x', 'ADXL345_y', 'ADXL345_z', 'ITG3200_x', 'ITG3200_y', 'ITG3200_z', 'MMA8451Q_x', 'MMA8451Q_y', 'MMA8451Q_z']
+    
 
-def get_person_info(subject_id):
+def get_person_info():
     # Open the readme file and read the lines
-    file_path = DATA_DIR +'Readme.txt'
+    subjects=[]
+    file_path = 'sisfall_subject.csv'
     print(file_path)
-    with open(file_path, 'r', encoding='latin1') as file:
-        strings = file.readlines()
+    with open(file_path, 'r') as csvfile:
+        spamreader = csv.reader(csvfile, delimiter= ';')
+        next(spamreader)
+        for row in spamreader:
+            subjects.append(list(map(float, row)))
+    list(np.float_(subjects))
 
-    # Parse the person information for the given person ID
-    person_list = []
-    for s in strings:
-        print('subject_id',s)
-        if re.match('^\| {subject_id}', s):   
-            temp = s.split('|')
-            temp = [x.strip() for x in temp]
-            if len(temp) == 7:
-                person_list.append(temp[1:-1])
-               # If person_list is empty, return an empty DataFrame
-            if not person_list:
-                return pd.DataFrame(columns=['subject', 'age', 'height', 'weight', 'gender'])
+    return subjects  # Returning the DataFrame directly
 
-            # Create a DataFrame with the person information
-            columns = ['subject', 'age', 'height', 'weight', 'gender']
-            person_info = pd.DataFrame(person_list, columns=columns)
-
-            # Convert the age, height, and weight columns to numeric values
-            person_info[['age', 'height', 'weight']] = person_info[['age', 'height', 'weight']].apply(pd.to_numeric)
-
-            # Encode the gender column as a categorical variable and then convert to numeric
-            person_info['gender'] = pd.Categorical(person_info['gender'], categories=['M', 'F'])
-            person_info['gender'].replace(['M', 'F'], [1, 0], inplace=True)
-            print(person_info)
-
-    return person_info  # Returning the DataFrame directly
-
-def process_file(file_path, subject_id):
+def process_file(file_path):
     segments = [] 
-    try:
-        # Read the data in chunks and process each chunk individually
-        for chunk in pd.read_csv(file_path, header=0, chunksize=1000): 
-# Apply sliding window segmentation
-            for i in range(0, len(chunk) - WINDOW_SIZE + 1, STRIDE):
+    with open(file_path, 'r') as txtfile:
+        spamreader = csv.reader(txtfile)
+        print(spamreader)
+        '''
+        for i in range(0, len(chunk) - WINDOW_SIZE + 1, STRIDE):
                 segment = chunk.iloc[i:i + WINDOW_SIZE].copy() 
                 segments.append(segment) 
             person_info = get_person_info(subject_id)  
@@ -72,6 +59,7 @@ def process_file(file_path, subject_id):
         print("Error processing {file_path}:",file_path )
         return None
     return segments
+    '''
 
 def process_subject(subject_id):
     print('Processing subject', subject_id)
@@ -86,6 +74,7 @@ def process_subject(subject_id):
                 all_segments.extend(segments)
     subject_dir = os.path.join(DATA_DIR, subject_id) 
     return all_segments
+
 def normalize_and_encode(all_data):
     try:
         scaler = StandardScaler()
@@ -149,13 +138,69 @@ def split_and_save_data(X, y):
         test_data.to_csv('Sis_test_data.csv', index=False)
     except Exception as e:
         print("Error in split_and_save_data:")
+        
+def generate_data(ids, activities, sliding_window_length, sliding_window_step, data_dir=None,
+                  identity_bool=False, usage_modus='train'):
+    '''
+    creates files for each of the sequences, which are extracted from a file
+    following a sliding window approach
+
+    returns
+    Sequences are stored in given path
+
+    @param ids: ids for train, val or test
+    @param sliding_window_length: length of window for segmentation
+    @param sliding_window_step: step between windows for segmentation
+    @param data_dir: path to dir where files will be stored
+    @param identity_bool: selecting for identity experiment
+    @param usage_modus: selecting Train, Val or testing
+    '''
+    
+    all_segments = []
+    #counter_seq = 0
+    #hist_classes_all = np.zeros((NUM_CLASSES))
+    recordings= ['R01', 'R02', 'R03', 'R04', 'R05', 'R06']
+    
+    for subject_id in ids:
+       print('Processing subject', subject_id)
+       subject_dir = os.path.join(DATA_DIR, subject_id)
+       file_list = os.listdir(subject_dir)
+       for act in activities:
+           print(act)
+           for R in recordings:
+               file_name= "{}_{}_{}.txt".format(act, subject_id, R)
+               print(file_name)
+               file_path = os.path.join(subject_dir, file_name)
+               print(file_path)
+               segments = process_file(file_path)
+               if segments is not None:
+                   all_segments.extend(segments)
+      
 
 
 def main():
-    for subject_id in SUBJECT_IDS:
-        person_info = get_person_info(subject_id)
+    person_info = get_person_info()
+    train_ids= ['SA01', ]#'SA02', 'SA03', 'SA04', 'SA05', 'SA06', 'SA07', 
+               #'SA08', 'SA09', 'SA10', 'SA11', 'SA12', 'SA13']
+    activities= ['D01', 'D02', 'D03',]# 'D04', 'D05', 'D07', 'D08', 'D09', 
+                 #'D10', 'D011', 'D12', 'D14', 'D15', 'D16', 'D17']
+    
+    base_directory='/data/nnair/idimuall/'
+    data_dir_train = base_directory + 'sequences_train/'
+    data_dir_val = base_directory + 'sequences_val/'
+    data_dir_test = base_directory + 'sequences_test/'
+    
+    generate_data(train_ids, activities, sliding_window_length=200, sliding_window_step=50, data_dir=data_dir_train, usage_modus='train')
     '''
-    sensor_cols = ['ADXL345_x', 'ADXL345_y', 'ADXL345_z', 'ITG3200_x', 'ITG3200_y', 'ITG3200_z', 'MMA8451Q_x', 'MMA8451Q_y', 'MMA8451Q_z']
+    generate_data(val_ids, activties, sliding_window_length=200, sliding_window_step=50, data_dir=data_dir_val, usage_modus='val')
+    generate_data(test_ids, activities, sliding_window_length=200, sliding_window_step=50, data_dir=data_dir_test, usage_modus='test')
+
+    generate_CSV(base_directory, "train.csv", data_dir_train)
+    generate_CSV(base_directory, "val.csv", data_dir_val)
+    generate_CSV(base_directory, "test.csv", data_dir_test)
+    generate_CSV_final(base_directory + "train_final.csv", data_dir_train, data_dir_val)
+
+    
     all_segments = []
     for subject_id in SUBJECT_IDS:
         subject_segments = process_subject(subject_id)
