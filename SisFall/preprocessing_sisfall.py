@@ -43,7 +43,7 @@ def get_person_info():
 def process_file(file_path):
     segments = [] 
     with open(file_path, 'r') as txtfile:
-        spamreader = csv.reader(txtfile)
+        spamreader = csv.reader(txtfile, delimiter=',')
         print(spamreader)
         '''
         for i in range(0, len(chunk) - WINDOW_SIZE + 1, STRIDE):
