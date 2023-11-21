@@ -48,7 +48,7 @@ def process_file(file_path):
             print(row)
             print(row[0])
             print(row[0].strip())
-            
+            row=row[0].strip()
             res = []
             for elem in row.split(','):
                 print(elem)
