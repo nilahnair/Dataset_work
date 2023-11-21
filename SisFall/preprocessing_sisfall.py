@@ -69,7 +69,7 @@ def process_file(file_path, subject_id):
                 segment[label] = person_info[label].values[0]  
 
     except Exception as e:
-        print(f"Error processing {file_path}: {e}")
+        print("Error processing {file_path}:",file_path )
         return None
     return segments
 
