@@ -43,7 +43,7 @@ def get_person_info():
 def process_file(file_path):
     sensor_data = [] 
     with open(file_path, 'r') as txtfile:
-        spamreader = csv.reader(txtfile, delimiter=',', quotechar=';')
+        spamreader = csv.reader(txtfile, delimiter=';')
         for row in spamreader:
             sensor_data.append(list(map(float,row)))
         print(sensor_data)
