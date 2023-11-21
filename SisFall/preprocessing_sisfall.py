@@ -45,8 +45,10 @@ def process_file(file_path):
     with open(file_path, 'r') as txtfile:
         spamreader = csv.reader(txtfile, delimiter=';')
         for row in spamreader:
+            print(row)
             res = []
             for elem in row.split(','):
+                print(elem)
                 res.append(float(elem))
             sensor_data.append(res)
         print(sensor_data)
