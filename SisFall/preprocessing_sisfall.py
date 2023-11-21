@@ -116,10 +116,7 @@ def extract_features(segment):
             features.append(segment[col].max())
             features.append(segment[col].min())
             features.append(np.sqrt(np.mean(segment[col]**2)))
-        feature_names = [
-        f'{col}_{stat}' for col in sensor_cols 
-        for stat in ['min', 'max','mean', 'std','rms']
-    ]
+        feature_names = ['{col}_{stat}' for col in sensor_cols for stat in ['min', 'max','mean', 'std','rms']]
     return pd.Series(features, index=feature_names).astype('float32')  
 
 def remove_original_sensor_data(df):
