@@ -44,7 +44,8 @@ def process_file(file_path):
     segments = [] 
     with open(file_path, 'r') as txtfile:
         spamreader = csv.reader(txtfile, delimiter=',')
-        print(spamreader)
+        for row in spamreader:
+            print(row)
         '''
         for i in range(0, len(chunk) - WINDOW_SIZE + 1, STRIDE):
                 segment = chunk.iloc[i:i + WINDOW_SIZE].copy() 
