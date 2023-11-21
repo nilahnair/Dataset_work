@@ -41,11 +41,12 @@ def get_person_info():
     return subjects  # Returning the DataFrame directly
 
 def process_file(file_path):
-    segments = [] 
+    sensor_data = [] 
     with open(file_path, 'r') as txtfile:
         spamreader = csv.reader(txtfile, delimiter=',')
         for row in spamreader:
-            print(row)
+            sensor_data.append(list(map(float,row)))
+        print(sensor_data)
         '''
         for i in range(0, len(chunk) - WINDOW_SIZE + 1, STRIDE):
                 segment = chunk.iloc[i:i + WINDOW_SIZE].copy() 
@@ -169,13 +170,16 @@ def generate_data(ids, activities, sliding_window_length, sliding_window_step, d
        for act in activities:
            print(act)
            for R in recordings:
-               file_name= "{}_{}_{}.txt".format(act, subject_id, R)
-               print(file_name)
-               file_path = os.path.join(subject_dir, file_name)
-               print(file_path)
-               segments = process_file(file_path)
-               if segments is not None:
-                   all_segments.extend(segments)
+               try:
+                   file_name= "{}_{}_{}.txt".format(act, subject_id, R)
+                   print(file_name)
+                   file_path = os.path.join(subject_dir, file_name)
+                   print(file_path)
+                   segments = process_file(file_path)
+               except: 
+                   print('no file path with name', file_name)
+                   if segments is not None:
+                       all_segments.extend(segments)
       
 
 
