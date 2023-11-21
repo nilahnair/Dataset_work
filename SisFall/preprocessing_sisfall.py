@@ -103,7 +103,7 @@ def normalize_and_encode(all_data):
             label_encoders[col] = le  
             
     except Exception as e:
-        print(f"Error in normalize_and_encode: {e}")
+        print("Error in normalize_and_encode")
         return None
 
 def extract_features(segment):
