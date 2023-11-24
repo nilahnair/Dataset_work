@@ -165,11 +165,10 @@ def generate_data(ids, activities, sliding_window_length, sliding_window_step, d
     @param usage_modus: selecting Train, Val or testing
     '''
     
-    all_segments = []
     #counter_seq = 0
     #hist_classes_all = np.zeros((NUM_CLASSES))
     recordings= ['R01', 'R02', 'R03', 'R04', 'R05', 'R06']
-    
+    all_segments = []
     for subject_id in ids:
        print('Processing subject', subject_id)
        subject_dir = os.path.join(DATA_DIR, subject_id)
@@ -185,7 +184,7 @@ def generate_data(ids, activities, sliding_window_length, sliding_window_step, d
                    #print(file_path)
                    segments = process_file(file_path)
                    print(len(segments))
-                   all_segments.append(segments)
+                   all_segments=np.vstack((all_segments, segments))
                    print('len of all segments')
                    print(len(all_segments))
                    
