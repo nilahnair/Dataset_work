@@ -50,7 +50,7 @@ def process_file(file_path):
             for elem in row.split(','):
                 res.append(float(elem))
             sensor_data.append(res)
-        print(sensor_data)
+       
         '''
         for i in range(0, len(chunk) - WINDOW_SIZE + 1, STRIDE):
                 segment = chunk.iloc[i:i + WINDOW_SIZE].copy() 
@@ -174,27 +174,45 @@ def generate_data(ids, activities, sliding_window_length, sliding_window_step, d
        for act in activities:
            print(act)
            for R in recordings:
+               segments=[]
                try:
                    file_name= "{}_{}_{}.txt".format(act, subject_id, R)
                    print(file_name)
                    file_path = os.path.join(subject_dir, file_name)
                    print(file_path)
                    segments = process_file(file_path)
+                   all_segments.append(segments)
                except: 
                    print('no file path with name', file_name)
-                   if segments is not None:
-                       all_segments.extend(segments)
-      
+                   #if segments is not None:
+                    #   all_segments.extend(segments)
+                    
+    print(all_segments.shape)
+    max_values = np.max(all_segments, axis=0)
+    print("Max values")
+    print(max_values)
+    min_values = np.min(all_segments, axis=0)
+    print("Min values")
+    print(min_values)
+    mean_values = np.mean(all_segments, axis=0)
+    print("Mean values")
+    print(mean_values)
+    std_values = np.std(all_segments, axis=0)
+    print("std values")
+    print(std_values)
 
 
 def main():
     person_info = get_person_info()
-    train_ids= ['SA01', ]#'SA02', 'SA03', 'SA04', 'SA05', 'SA06', 'SA07', 
-               #'SA08', 'SA09', 'SA10', 'SA11', 'SA12', 'SA13']
-    activities= ['D01', 'D02', 'D03',]# 'D04', 'D05', 'D07', 'D08', 'D09', 
-                 #'D10', 'D011', 'D12', 'D14', 'D15', 'D16', 'D17']
+    train_ids= ['SA01','SA02', 'SA03', 'SA04', 'SA05', 'SA06', 'SA07', 
+                'SA08', 'SA09', 'SA10', 'SA11', 'SA12', 'SA13', 'SA14', 
+                'SA15', 'SA16', 'SA17', 'SA18', 'SA19', 'SA20', 'SA21', 
+                'SA22', 'SA23', 'SE01', 'SE02', 'SE03', 'SE04', 'SE05', 
+                'SE06', 'SE07', 'SE08', 'SE09', 'SE10', 'SE11', 'SE12', 'SE13', 'SE14', 'SE15']
+    activities= ['D01', 'D02', 'D03', 'D04', 'D05', 'D07', 'D08', 'D09', 
+                 'D10', 'D011', 'D12', 'D14', 'D15', 'D16', 'D17']
     
-    base_directory='/data/nnair/idimuall/'
+    base_directory ='/data/nnair/idimuall/'
     data_dir_train = base_directory + 'sequences_train/'
     data_dir_val = base_directory + 'sequences_val/'
     data_dir_test = base_directory + 'sequences_test/'
