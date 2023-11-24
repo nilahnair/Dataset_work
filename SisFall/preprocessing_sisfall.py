@@ -51,7 +51,7 @@ def process_file(file_path):
                 res.append(float(elem))
             sensor_data.append(res)
             
-    print(len(sensor_data)) 
+    #print(len(sensor_data)) 
     return sensor_data
        
 '''
@@ -185,6 +185,7 @@ def generate_data(ids, activities, sliding_window_length, sliding_window_step, d
                    segments = process_file(file_path)
                    print(len(segments))
                    segments=np.array([np.array(i) for i in segments])
+                   print(segments.shape)
                    all_segments=np.vstack((all_segments, segments))
                    print('len of all segments')
                    print(len(all_segments))
