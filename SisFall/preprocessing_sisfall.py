@@ -186,21 +186,19 @@ def generate_data(ids, activities, sliding_window_length, sliding_window_step, d
                    print(len(segments))
                    segments=np.array([np.array(i) for i in segments])
                    print(segments.shape)
-                   print(segments)
+                   #print(segments)
                    all_segments=np.concatenate((all_segments, segments), axis=0)
                    print('len of all segments')
-                   print(len(all_segments))
+                   print(all_segments.shape)
                    
                except: 
                    print('no file path with name', file_name)
                    #if segments is not None:
                     #   all_segments.extend(segments)
                     
-    print(len(all_segments))
-    #numpy.array([numpy.array(xi) for xi in x])
-    all_segments=np.array([np.array(i) for i in all_segments])
     print(all_segments.shape)
-    '''
+    #numpy.array([numpy.array(xi) for xi in x])
+    
     max_values = np.max(all_segments, axis=0)
     print("Max values")
     print(max_values)
@@ -213,7 +211,7 @@ def generate_data(ids, activities, sliding_window_length, sliding_window_step, d
     std_values = np.std(all_segments, axis=0)
     print("std values")
     print(std_values)
-    '''
+  
 
 
 def main():
