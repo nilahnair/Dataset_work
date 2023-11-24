@@ -50,8 +50,11 @@ def process_file(file_path):
             for elem in row.split(','):
                 res.append(float(elem))
             sensor_data.append(res)
+            
+    print(len(sensor_data)) 
+    return sensor_data
        
-        '''
+'''
         for i in range(0, len(chunk) - WINDOW_SIZE + 1, STRIDE):
                 segment = chunk.iloc[i:i + WINDOW_SIZE].copy() 
                 segments.append(segment) 
@@ -65,7 +68,7 @@ def process_file(file_path):
         print("Error processing {file_path}:",file_path )
         return None
     return segments
-    '''
+'''
 
 def process_subject(subject_id):
     print('Processing subject', subject_id)
