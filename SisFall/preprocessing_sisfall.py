@@ -172,15 +172,16 @@ def generate_data(ids, activities, sliding_window_length, sliding_window_step, d
        subject_dir = os.path.join(DATA_DIR, subject_id)
        file_list = os.listdir(subject_dir)
        for act in activities:
-           print(act)
+           #print(act)
            for R in recordings:
                segments=[]
                try:
                    file_name= "{}_{}_{}.txt".format(act, subject_id, R)
                    print(file_name)
                    file_path = os.path.join(subject_dir, file_name)
-                   print(file_path)
+                   #print(file_path)
                    segments = process_file(file_path)
+                   print(len(segments))
                    all_segments.append(segments)
                except: 
                    print('no file path with name', file_name)
@@ -188,6 +189,8 @@ def generate_data(ids, activities, sliding_window_length, sliding_window_step, d
                     #   all_segments.extend(segments)
                     
     print(len(all_segments))
+    all_segments=np.asarray(all_segments)
+    
     max_values = np.max(all_segments, axis=0)
     print("Max values")
     print(max_values)
