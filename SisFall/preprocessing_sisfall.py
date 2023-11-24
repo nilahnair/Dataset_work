@@ -184,7 +184,7 @@ def generate_data(ids, activities, sliding_window_length, sliding_window_step, d
                    #print(file_path)
                    segments = process_file(file_path)
                    print(len(segments))
-                   print(segments[1])
+                   print(segments)
                    all_segments=np.vstack((all_segments, segments))
                    print('len of all segments')
                    print(len(all_segments))
