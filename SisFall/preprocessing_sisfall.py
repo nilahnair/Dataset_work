@@ -186,6 +186,9 @@ def generate_data(ids, activities, sliding_window_length, sliding_window_step, d
                    segments = process_file(file_path)
                    print(len(segments))
                    all_segments.append(segments)
+                   print('len of all segments')
+                   print(len(all_segments))
+                   
                except: 
                    print('no file path with name', file_name)
                    #if segments is not None:
