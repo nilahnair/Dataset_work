@@ -192,7 +192,7 @@ def generate_data(ids, activities, sliding_window_length, sliding_window_step, d
                     #   all_segments.extend(segments)
                     
     print(len(all_segments))
-    all_segments=np.asarray(all_segments)
+    all_segments=np.array(all_segments)
     '''
     max_values = np.max(all_segments, axis=0)
     print("Max values")
