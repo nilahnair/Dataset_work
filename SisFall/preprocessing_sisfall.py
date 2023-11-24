@@ -168,7 +168,7 @@ def generate_data(ids, activities, sliding_window_length, sliding_window_step, d
     #counter_seq = 0
     #hist_classes_all = np.zeros((NUM_CLASSES))
     recordings= ['R01', 'R02', 'R03', 'R04', 'R05', 'R06']
-    all_segments = []
+    all_segments = np.empty((0, 9))
     for subject_id in ids:
        print('Processing subject', subject_id)
        subject_dir = os.path.join(DATA_DIR, subject_id)
