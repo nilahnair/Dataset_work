@@ -186,7 +186,7 @@ def generate_data(ids, activities, sliding_window_length, sliding_window_step, d
                    print(len(segments))
                    segments=np.array([np.array(i) for i in segments])
                    print(segments.shape)
-                   all_segments=np.vstack((all_segments, segments))
+                   all_segments=np.concatenate((all_segments, segments), axis=0)
                    print('len of all segments')
                    print(len(all_segments))
                    
