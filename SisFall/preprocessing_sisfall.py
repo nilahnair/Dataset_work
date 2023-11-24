@@ -187,7 +187,7 @@ def generate_data(ids, activities, sliding_window_length, sliding_window_step, d
                    #if segments is not None:
                     #   all_segments.extend(segments)
                     
-    print(all_segments.shape)
+    print(len(all_segments))
     max_values = np.max(all_segments, axis=0)
     print("Max values")
     print(max_values)
