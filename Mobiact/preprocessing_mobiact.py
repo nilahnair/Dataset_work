@@ -15,26 +15,52 @@ import datetime
 import csv_reader
 from sliding_window import sliding_window
 import pickle
+import time
+import pandas as pd
 
 # folder path
 FOLDER_PATH = "/vol/actrec/MobiAct_Dataset/"
-
-#PERSONS = ['S14']
-
-SENSORS = ['LA', 'LL', 'N', 'RA', 'RL', 'T']
-
-SCENARIO = {'R01': 'L01', 'R02': 'L01', 'R03': 'L02', 'R04': 'L02', 'R05': 'L02', 'R06': 'L02', 'R07': 'L02',
-            'R08': 'L02', 'R09': 'L02', 'R10': 'L02', 'R11': 'L02', 'R12': 'L02', 'R13': 'L02', 'R14': 'L02',
-            'R15': 'L02', 'R16': 'L02', 'R17': 'L03', 'R18': 'L03', 'R19': 'L03', 'R20': 'L03', 'R21': 'L03',
-            'R22': 'L03', 'R23': 'L03', 'R24': 'L03', 'R25': 'L03', 'R26': 'L03', 'R27': 'L03', 'R28': 'L03',
-            'R29': 'L03', 'R30': 'L03'}
+SUBJECT_INFO_FILE = '/vol/actrec/MobiAct_Dataset/Readme.txt'
 
 
-labels_persons = {"S07": 0, "S08": 1, "S09": 2, "S10": 3, "S11": 4, "S12": 5, "S13": 6, "S14": 7}
+WINDOW_SIZE = 200
+STRIDE = 50
 
-NUM_CLASSES = 8
-NUM_ATTRIBUTES = 19
+activities_id={'STD':0, 'WAL':1, 'JOG':2, 'JUM':3, 'STU':4, 'STN':5, 'SCH':6, 'CSI':7, 'CSO':8}
+subject_id={'1':0, '2':1, '3':2, '4':3, '5':4, '6':5, '7':6, '8':7, '9':8, '10':9, 
+            '11':10, '12':11, '16':12, '18':13, '19':14, '20':14, 
+            '21':15, '22':16, '23':17, '24':18, '25':19, '26':20, '27':21, '29':22,
+            '32':23, '33':24, '35':25, '36':26, '37':27, '38':28, '39':29, '40':30, 
+            '41':31, '42':32, '43':33, '44':34, '45':35, '46':36, '47':37, '48':38, '49':39, '50':40, 
+            '51':41, '52':42, '53':43, '54':44, '55':45, '56':46, '58':47, '59':48, '60':49,
+            '61':50, '62':51, '63':52, '64':53, '65':54, '66':55, '67':56}
+act_record={'STD':1, 'WAL':1, 'JOG':3, 'JUM':3, 'STU':6, 'STN':6, 'SCH':6, 'CSI':6, 'CSO':6}
 
+def read_subject_info(file_path):
+    """
+    Reads subject information from a file and returns a pandas DataFrame.
+
+    Args:
+        file_path (str): The path to the file containing the subject information.
+
+    Returns:
+        pandas.DataFrame: A DataFrame containing the subject information, with columns for subject ID, age, height, weight, and gender.
+    """
+    with open(file_path, 'r', encoding='latin1') as file:
+        strings = file.readlines()
+    file.close()
+    person_list = []
+    for s in strings:
+        if 'sub' in s and '|' in s:
+            temp = s.split('|')
+            temp = [x.strip() for x in temp]
+            if len(temp) == 9:
+                person_list.append(temp[3:-1])
+    columns = ['subject', 'age', 'height', 'weight', 'gender']
+    person_info = pd.DataFrame(person_list, columns=columns)
+    person_info[['age', 'height', 'weight']] = person_info[['age', 'height', 'weight']].apply(pd.to_numeric)
+    person_info['gender'] = pd.Categorical(person_info['gender'], categories=['M', 'F','Ì '])
+    return person_info
 
 
 def reader_data(path):
@@ -114,7 +140,7 @@ def opp_sliding_window(data_x, data_y, ws, ss, label_pos_end=True):
     @param ss: ids for train
     @param label_pos_end: ids for train
     '''
-
+'''
     print("Sliding window: Creating windows {} with step {}".format(ws, ss))
 
     data_x = sliding_window(data_x, (ws, data_x.shape[1]), (ss, 1))
@@ -153,7 +179,7 @@ def opp_sliding_window(data_x, data_y, ws, ss, label_pos_end=True):
 
     return data_x.astype(np.float32), data_y_labels.astype(np.uint8), data_y_all.astype(np.uint8)
 
-
+'''
 def divide_x_y(data):
     """
     Segments each sample into features and label
@@ -204,10 +230,7 @@ def generate_data(ids, sliding_window_length, sliding_window_step, data_dir=None
                  "R24", "R25", "R26", "R27", "R28", "R29", "R30"]
     val_ids = ["R11","R12"]
     test_ids = ["R15"]
-
-    counter_seq = 0
-    hist_classes_all = np.zeros((NUM_CLASSES))
-
+'''
     for P in persons:
        if usage_modus == 'train':
            recordings = train_ids
@@ -318,7 +341,7 @@ def generate_data(ids, sliding_window_length, sliding_window_step, data_dir=None
                print('\nYou cancelled the operation.')
 
     return
-
+'''
 
 def generate_CSV(csv_dir, type_file, data_dir):
     '''
@@ -371,92 +394,34 @@ def create_dataset(identity_bool = False):
 
     @param half: set for creating dataset with half the frequence.
     '''
-    train_ids = ["R01", "R02", "R03", "R04", "R05", "R06", "R07", "R08", "R09", "R10", 
-                 "R13", "R14", "R16", "R17", "R18", "R19", "R20", "R21", "R22", "R23", 
-                 "R24", "R25", "R26", "R27", "R28", "R29", "R30"]
-    val_ids = ["R11","R12"]
-    test_ids = ["R15"]
+    
+    #annotated file structure: timestamp,rel_time,acc_x,acc_y,acc_z,gyro_x,gyro_y,gyro_z,azimuth,pitch,roll,label
+    train_id=['1', '2', '3', '4', '5','6']
+    
+    print("Reading subject info...")
+    start_time = time.time()
+    subject_info = read_subject_info(SUBJECT_INFO_FILE)
+    print(f"Subject info read in {time.time() - start_time:.2f} seconds.")
+    print(subject_info)
 
-    #all_data = ["S07", "S08", "S09", "S10", "S11", "S12", "S13", "S14"]
-
-    # general_statistics(train_ids)
-
-    # base_directory = '/path_where_sequences_will_ve_stored/mbientlab_10_persons/'
-    # base_directory = '/path_where_sequences_will_ve_stored/mbientlab_50_persons/'
-    # base_directory = '/path_where_sequences_will_ve_stored/mbientlab_10_recordings/'
-    #base_directory = '/path_where_sequences_will_ve_stored/mbientlab_50_recordings/'
-    #base_directory = '/data/nnair/trial/imu_all/'
+'''
     base_directory = '/data/nnair/idimuall/'
     data_dir_train = base_directory + 'sequences_train/'
     data_dir_val = base_directory + 'sequences_val/'
     data_dir_test = base_directory + 'sequences_test/'
-
+    
     generate_data(train_ids, sliding_window_length=100, sliding_window_step=12, data_dir=data_dir_train, usage_modus='train')
     generate_data(val_ids, sliding_window_length=100, sliding_window_step=12, data_dir=data_dir_val, usage_modus='val')
     generate_data(test_ids, sliding_window_length=100, sliding_window_step=12, data_dir=data_dir_test, usage_modus='test')
-
+    
     generate_CSV(base_directory, "train.csv", data_dir_train)
     generate_CSV(base_directory, "val.csv", data_dir_val)
     generate_CSV(base_directory, "test.csv", data_dir_test)
     generate_CSV_final(base_directory + "train_final.csv", data_dir_train, data_dir_val)
-
+    '''
     return
 
 
-def statistics_measurements():
-    '''
-    Compute some statistics of the duration of the sequences data:
-
-    print:
-    Max and Min durations per class or attr
-    Mean and Std durations per class or attr
-
-    @param
-    '''
-
-    train_final_ids = ["P07", "P08", "P09", "P10", "P11", "P12"]
-
-    persons = ["P01", "P02", "P03", "P04", "P05", "P06", "P07", "P08", "P09", "P10", "P11", "P12", "P13", "P14"]
-    recordings = ['R{:02d}'.format(r) for r in range(1, 31)]
-
-    counter_seq = 0
-    hist_classes_all = np.zeros((NUM_CLASSES))
-
-    g, ax_x = plt.subplots(2, sharex=False)
-    line3, = ax_x[0].plot([], [], '-b', label='blue')
-    line4, = ax_x[1].plot([], [], '-b', label='blue')
-    accumulator_measurements = np.empty((0,30))
-    for P in persons:
-        if P not in train_final_ids:
-            print("\n6 No Person in expected IDS {}".format(P))
-        else:
-            for r, R in enumerate(recordings):
-                S = SCENARIO[r]
-                file_name_data = "{}/{}_{}_{}.csv".format(P, S, P, R)
-                file_name_label = "{}/{}_{}_{}_labels.csv".format(P, S, P, R)
-                print("------------------------------\n{}\n{}".format(file_name_data, file_name_label))
-                try:
-                    # getting data
-                    data = reader_data(FOLDER_PATH + file_name_data)
-                    data_x = data["data"]
-                    accumulator_measurements = np.append(accumulator_measurements, data_x, axis = 0)
-                    print("\nFiles loaded")
-                except:
-                    print("\n1 In loading data,  in file {}".format(FOLDER_PATH + file_name_data))
-                    continue
-
-    try:
-        max_values = np.max(accumulator_measurements, axis=0)
-        min_values = np.min(accumulator_measurements, axis=0)
-        mean_values = np.mean(accumulator_measurements, axis=0)
-        std_values = np.std(accumulator_measurements, axis=0)
-    except:
-        max_values = 0
-        min_values = 0
-        mean_values = 0
-        std_values = 0
-        print("Error computing statistics")
-    return max_values, min_values, mean_values, std_values
 
 
 def norm_mbientlab(data):
