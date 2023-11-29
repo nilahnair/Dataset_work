@@ -294,17 +294,17 @@ def generate_data(ids, activities, sliding_window_length, sliding_window_step, d
                print("error in sliding window")
                
            if usage_modus=='trainval':
-               X_train = np.append(X_train, train)
+               X_train = np.vstack((X_train, train))
                act_train = np.append(act_train, train_act)
                id_train = np.append(id_train, train_id)
                print('done train')
                             
-               X_val = np.append(X_val, val)
+               X_val = np.append((X_val, val))
                act_val = np.append(act_val, val_act)
                id_val = np.append(id_val, val_id)
                print('done val')
            elif usage_modus=='test':
-               X_test = np.append(X_test, test)
+               X_test = np.append((X_test, test))
                act_test = np.append(act_test, test_act)
                id_test = np.append(id_test, test_id)
                print('done test')
@@ -312,6 +312,8 @@ def generate_data(ids, activities, sliding_window_length, sliding_window_step, d
            if usage_modus=='trainval':
                print('X_train')
                print(X_train.shape)
+               print(act_train.shape)
+               print(id_train.shape)
                print('X_val')
                print(X_val.shape)
            elif usage_modus=='test':
