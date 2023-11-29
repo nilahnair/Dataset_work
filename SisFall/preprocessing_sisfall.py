@@ -414,8 +414,49 @@ def generate_data(ids, activities, sliding_window_length, sliding_window_step, d
         print("error in saving")  
         
     return
-        
+
+def generate_CSV(csv_dir, data_dir):
+    '''
+    Generate CSV file with path to all (Training) of the segmented sequences
+    This is done for the DATALoader for Torch, using a CSV file with all the paths from the extracted
+    sequences.
+
+    @param csv_dir: Path to the dataset
+    @param data_dir: Path of the training data
+    '''
+    f = []
+    for dirpath, dirnames, filenames in os.walk(data_dir):
+        for n in range(len(filenames)):
+            f.append(data_dir + 'seq_{0:06}.pkl'.format(n))
+
+    #np.savetxt(csv_dir + type_file, f, delimiter="\n", fmt='%s')
+    np.savetxt(csv_dir, f, delimiter="\n", fmt='%s')
     
+    return
+
+def generate_CSV_final(csv_dir, data_dir1, data_dir2):
+    '''
+    Generate CSV file with path to all (Training and Validation) of the segmented sequences
+    This is done for the DATALoader for Torch, using a CSV file with all the paths from the extracted
+    sequences.
+
+    @param csv_dir: Path to the dataset
+    @param data_dir1: Path of the training data
+    @param data_dir2: Path of the validation data
+    '''
+    f = []
+    for dirpath, dirnames, filenames in os.walk(data_dir1):
+        for n in range(len(filenames)):
+            f.append(data_dir1 + 'seq_{0:06}.pkl'.format(n))
+
+    for dirpath, dirnames, filenames in os.walk(data_dir2):
+        for n in range(len(filenames)):
+            f.append(data_dir1 + 'seq_{0:06}.pkl'.format(n))
+
+    np.savetxt(csv_dir, f, delimiter="\n", fmt='%s')
+
+    return
+
 
 def main():
     person_info = get_person_info()
@@ -433,16 +474,14 @@ def main():
     data_dir_test = base_directory + 'sequences_test/'
     
     generate_data(train_ids, activities, sliding_window_length=200, sliding_window_step=50, data_dir=data_dir_train, usage_modus='trainval')
-    '''
-    generate_data(val_ids, activties, sliding_window_length=200, sliding_window_step=50, data_dir=data_dir_val, usage_modus='val')
-    generate_data(test_ids, activities, sliding_window_length=200, sliding_window_step=50, data_dir=data_dir_test, usage_modus='test')
+    generate_data(train_ids, activities, sliding_window_length=200, sliding_window_step=50, data_dir=data_dir_test, usage_modus='test')
 
     generate_CSV(base_directory, "train.csv", data_dir_train)
     generate_CSV(base_directory, "val.csv", data_dir_val)
     generate_CSV(base_directory, "test.csv", data_dir_test)
     generate_CSV_final(base_directory + "train_final.csv", data_dir_train, data_dir_val)
 
-    
+    '''
     all_segments = []
     for subject_id in SUBJECT_IDS:
         subject_segments = process_subject(subject_id)
