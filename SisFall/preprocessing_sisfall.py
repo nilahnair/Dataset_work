@@ -299,12 +299,12 @@ def generate_data(ids, activities, sliding_window_length, sliding_window_step, d
                id_train = np.append(id_train, train_id)
                print('done train')
                             
-               X_val = np.append((X_val, val))
+               X_val = np.vstack((X_val, val))
                act_val = np.append(act_val, val_act)
                id_val = np.append(id_val, val_id)
                print('done val')
            elif usage_modus=='test':
-               X_test = np.append((X_test, test))
+               X_test = np.vstack((X_test, test))
                act_test = np.append(act_test, test_act)
                id_test = np.append(id_test, test_id)
                print('done test')
