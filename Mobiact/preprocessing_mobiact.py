@@ -403,6 +403,7 @@ def create_dataset(identity_bool = False):
     subject_info = read_subject_info(SUBJECT_INFO_FILE)
     print(f"Subject info read in {time.time() - start_time:.2f} seconds.")
     print(subject_info)
+    return
 
 '''
     base_directory = '/data/nnair/idimuall/'
@@ -418,11 +419,8 @@ def create_dataset(identity_bool = False):
     generate_CSV(base_directory, "val.csv", data_dir_val)
     generate_CSV(base_directory, "test.csv", data_dir_test)
     generate_CSV_final(base_directory + "train_final.csv", data_dir_train, data_dir_val)
-    '''
-    return
-
-
-
+'''
+    
 
 def norm_mbientlab(data):
     """
