@@ -186,16 +186,16 @@ def generate_data(ids, activities, sliding_window_length, sliding_window_step, d
     data_dir_test = data_dir + 'sequences_test/'
     
     if usage_modus=='trainval':
-        X_train = np.empty((0, 9))
+        X_train = np.empty((0, 200, 9))
         act_train = np.empty((0))
         id_train = np.empty((0))
     
-        X_val = np.empty((0, 9))
+        X_val = np.empty((0, 200, 9))
         act_val = np.empty((0))
         id_val = np.empty((0))
     
     elif usage_modus=='test':
-        X_test = np.empty((0, 9))
+        X_test = np.empty((0, 200, 9))
         act_test = np.empty((0))
         id_test = np.empty((0))
     
