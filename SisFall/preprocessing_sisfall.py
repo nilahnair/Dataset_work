@@ -9,6 +9,10 @@ from sklearn.model_selection import train_test_split
 from multiprocessing import Pool
 from sliding_window_sf import sliding_window
 
+import sys
+import pickle
+
+
 import csv
 
 
@@ -159,30 +163,6 @@ def normalize(data):
         raise("Error in normalisation")
 
     return data_norm
-
-def extract_features(segment):
-    features = []
-    sensor_cols = ['ADXL345_x', 'ADXL345_y', 'ADXL345_z', 'ITG3200_x', 'ITG3200_y', 'ITG3200_z', 'MMA8451Q_x', 'MMA8451Q_y', 'MMA8451Q_z']
-    for col in segment.columns:
-        if col in  sensor_cols:
-            features.append(segment[col].mean())
-            features.append(segment[col].std())
-            features.append(segment[col].max())
-            features.append(segment[col].min())
-            features.append(np.sqrt(np.mean(segment[col]**2)))
-        feature_names = ['{col}_{stat}' for col in sensor_cols for stat in ['min', 'max','mean', 'std','rms']]
-    return pd.Series(features, index=feature_names).astype('float32')  
-
-def remove_original_sensor_data(df):
-    sensor_cols = ['ADXL345_x', 'ADXL345_y', 'ADXL345_z', 'ITG3200_x', 'ITG3200_y', 'ITG3200_z', 'MMA8451Q_x', 'MMA8451Q_y', 'MMA8451Q_z']
-    return df.drop(columns=sensor_cols)
-
-def rearrange_columns(df):
-    cols = list(df.columns)
-    cols = [col for col in cols if col not in ['person_id', 'age', 'height', 'weight', 'gender']]
-    cols.extend(['person_id', 'age', 'height', 'weight', 'gender'])
-    return df[cols]
-
         
 def generate_data(ids, activities, sliding_window_length, sliding_window_step, data_dir=None,
                   identity_bool=False, usage_modus='train'):
@@ -200,6 +180,11 @@ def generate_data(ids, activities, sliding_window_length, sliding_window_step, d
     @param identity_bool: selecting for identity experiment
     @param usage_modus: selecting Train, Val or testing
     '''
+    
+    data_dir_train = data_dir + 'sequences_train/'
+    data_dir_val = data_dir + 'sequences_val/'
+    data_dir_test = data_dir + 'sequences_test/'
+    
     
     if usage_modus=='trainval':
         X_train = np.empty((0, 9))
@@ -290,18 +275,140 @@ def generate_data(ids, activities, sliding_window_length, sliding_window_step, d
                    print('Sliding window')
                    train = sliding_window(train, (ws, train.shape[1]), (ss, 1))
                    print(train.shape)
-                   train_act = np.full(train.shape, activities_id[act])
+                   train_act = np.full(train.shape[0], activities_id[act])
+                   train_id = np.full(train.shape[0], Subject_id[subject_id])
                    print('train_act')
                    print(train_act[0])
                    print(train_act.shape)
                    val = sliding_window(val, (ws, val.shape[1]), (ss, 1))
+                   val_act = np.full(val.shape[0], activities_id[act])
+                   val_id = np.full(val.shape[0], Subject_id[subject_id])
+                   
                    print(val.shape)
                elif usage_modus=='test':
                    print('Sliding window')
                    test= sliding_window(test, (ws, test.shape[1]), (ss, 1))
+                   test_act = np.full(test.shape[0], activities_id[act])
+                   test_id = np.full(test.shape[0], Subject_id[subject_id])
                    print(test.shape)
            except:
                print("error in sliding window")
+               
+           if usage_modus=='trainval':
+               X_train = np.append(X_train, train)
+               act_train = np.append(act_train, train_act)
+               id_train = np.append(id_train, train_id)
+               print('done train')
+                            
+               X_val = np.append(X_val, val)
+               act_val = np.append(act_val, val_act)
+               id_val = np.append(id_val, val_id)
+               print('done val')
+           elif usage_modus=='test':
+               X_test = np.append(X_test, test)
+               act_test = np.append(act_test, test_act)
+               id_test = np.append(id_test, test_id)
+               print('done test')
+               
+           if usage_modus=='trainval':
+               print('X_train')
+               print(X_train.shape)
+               print('X_val')
+               print(X_val.shape)
+           elif usage_modus=='test':
+               print('X_test')
+               print(X_test.shape) 
+    
+    try:
+        
+        print("training data save")
+        if usage_modus=='train':
+            print("target file name")
+            print(data_dir_train)
+            counter_seq = 0
+            for f in range(X_train.shape[0]):
+                try:
+                    sys.stdout.write('\r' + 'Creating sequence file '
+                                     'number {} with id {}'.format(f, counter_seq))
+                    sys.stdout.flush()
+                    
+                    # print "Creating sequence file number {} with id {}".format(f, counter_seq)
+                    seq = np.reshape(X_train[f], newshape = (1, X_train.shape[1], X_train.shape[2]))
+                    seq = np.require(seq, dtype=np.float)
+                    # Storing the sequences
+                    #obj = {"data": seq, "label": labelid}
+                    print("input values are")
+                    print(seq.shape)
+                    obj = {"data": seq, "act_label": act_train[f], "label": id_train[f]}
+                    
+                    f = open(os.path.join(data_dir_train, 'seq_{0:06}.pkl'.format(counter_seq)), 'wb')
+                    pickle.dump(obj, f, protocol=pickle.HIGHEST_PROTOCOL)
+                    f.close()
+
+                    counter_seq += 1
+                except:
+                    raise('\nError adding the seq')
+                
+            print("val data save")
+            print("target file name")
+            print(data_dir_val)
+            counter_seq = 0
+            for f in range(X_val.shape[0]):
+                try:
+                    sys.stdout.write('\r' + 'Creating sequence file '
+                                     'number {} with id {}'.format(f, counter_seq))
+                    sys.stdout.flush()
+
+                    # print "Creating sequence file number {} with id {}".format(f, counter_seq)
+                    seq = np.reshape(X_val[f], newshape = (1, X_val.shape[1], X_val.shape[2]))
+                    seq = np.require(seq, dtype=np.float)
+                    # Storing the sequences
+                    #obj = {"data": seq, "label": labelid}
+                    print("input values are")
+                    print(seq.shape)
+                    print(act_val[f])
+                    print(id_val[f])
+                    obj = {"data": seq, "act_label": act_val[f], "label": id_val[f]}
+                
+                    f = open(os.path.join(data_dir_val, 'seq_{0:06}.pkl'.format(counter_seq)), 'wb')
+                    pickle.dump(obj, f, protocol=pickle.HIGHEST_PROTOCOL)
+                    f.close()
+
+                    counter_seq += 1
+                except: 
+                     raise('\nError adding the seq')
+        elif usage_modus=='test':         
+            print("test data save")
+            print("target file name")
+            print(data_dir_test)
+            counter_seq = 0
+            for f in range(X_test.shape[0]):
+                try:
+                    sys.stdout.write('\r' + 'Creating sequence file '
+                                     'number {} with id {}'.format(f, counter_seq))
+                    sys.stdout.flush()
+
+                    # print "Creating sequence file number {} with id {}".format(f, counter_seq)
+                    seq = np.reshape(X_test[f], newshape = (1, X_test.shape[1], X_test.shape[2]))
+                    seq = np.require(seq, dtype=np.float)
+                    # Storing the sequences
+                    #obj = {"data": seq, "label": labelid}
+                    print("input values are")
+                    print(seq.shape)
+                    print(act_test[f])
+                    print(id_test[f])
+                    obj = {"data": seq, "act_label": act_test[f], "label": id_test[f]}
+                
+                    f = open(os.path.join(data_dir_test, 'seq_{0:06}.pkl'.format(counter_seq)), 'wb')
+                    pickle.dump(obj, f, protocol=pickle.HIGHEST_PROTOCOL)
+                    f.close()
+
+                    counter_seq += 1
+                except:
+                    raise('\nError adding the seq')
+    except:
+        print("error in saving")  
+        
     
 
 def main():
