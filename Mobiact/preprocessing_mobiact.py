@@ -12,7 +12,6 @@ import os
 import sys
 import matplotlib.pyplot as plt
 import datetime
-import csv_reader
 from sliding_window import sliding_window
 import pickle
 import time
