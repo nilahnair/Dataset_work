@@ -21,6 +21,8 @@ SUBJECT= ['SA01', 'SA02', 'SA03', 'SA04', 'SA05', 'SA06', 'SA07', 'SA08', 'SA09'
 Subject_id= {'SA01':0, 'SA02':1, 'SA03':2, 'SA04':3, 'SA05':4, 'SA06':5, 'SA07':6, 'SA08':7, 'SA09':8, 'SA10':9, 'SA11':10, 'SA12':11, 
                'SA13':12, 'SA14':13, 'SA15':14, 'SA16':15, 'SA17':16, 'SA18':17, 'SA19':18, 'SA20':19, 'SA21':20, 'SA22':21, 'SA23':22, 'SE01':23, 'SE02':24,
                'SE03':25, 'SE04':26, 'SE05':27, 'SE06':28, 'SE07':29, 'SE08':30, 'SE09':31, 'SE10':32, 'SE11':33, 'SE12':34, 'SE13':35, 'SE14':36, 'SE15':37}
+activities_id= {'D01':0, 'D02':1, 'D03':2, 'D05':3, 'D07':4, 'D08':5, 'D09':6, 
+                 'D10':7, 'D011':8, 'D12':9, 'D14':10, 'D15':11, 'D16':12, 'D17':13}
 ws = 200 #WINDOW_SIZE
 ss = 50 #STRIDE 
 SOFT_BIOMETRICS = ['age', 'height', 'weight', 'gender']
@@ -244,6 +246,7 @@ def generate_data(ids, activities, sliding_window_length, sliding_window_step, d
                    #if segments is not None:
                     #   all_segments.extend(segments)
            try:
+               print('normalise')
                data_x = normalize(all_segments)
            except:
                print("\n3  In normalising, issues found.")
@@ -255,44 +258,48 @@ def generate_data(ids, activities, sliding_window_length, sliding_window_step, d
                tv= train_no+val_no
                
            if usage_modus=='trainval':
-               X_train = np.vstack((X_train, all_segments[0:train_no,:]))
+               train =data_x[0:train_no,:]
                #act_train = np.append(act_train, [lbls[0:train_no,0]])
                #id_train = np.append(id_train, [lbls[0:train_no,1]])
-               print('done train')
+               print('train split')
                             
-               X_val = np.vstack((X_val, all_segments[train_no:tv,:]))
+               val = data_x[train_no:tv,:]
                #act_val = np.append(act_val, [lbls[train_no:tv,0]])
                #id_val = np.append(id_val, [lbls[train_no:tv,1]])
-               print('done val')
+               print('val split')
            elif usage_modus=='test':
-                X_test = np.vstack((X_test, all_segments[tv:frames,:]))
+                test = data_x[tv:frames,:]
                 #act_test = np.append(act_test, [lbls[tv:frames,0]])
                 #id_test = np.append(id_test, [lbls[tv:frames,1]])
-                print('done test')
+                print('test split')
                     
            print('frames')
            print(frames)
            if usage_modus=='trainval':
-               print('X_train')
-               print(X_train.shape)
-               print('X_val')
-               print(X_val.shape)
+               print('train')
+               print(train.shape)
+               print('val')
+               print(val.shape)
            elif usage_modus=='test':
-               print('X_test')
-               print(X_test.shape)
+               print('test')
+               print(test.shape)
                     
                
            try: 
                if usage_modus=='trainval':
                    print('Sliding window')
-                   X_train = sliding_window(X_train, (ws, X_train.shape[1]), (ss, 1))
-                   print(X_train.shape)
-                   X_val = sliding_window(X_val, (ws, X_val.shape[1]), (ss, 1))
-                   print(X_val.shape)
+                   train = sliding_window(train, (ws, train.shape[1]), (ss, 1))
+                   print(train.shape)
+                   train_act = np.full(train.shape, activities_id[act])
+                   print('train_act')
+                   print(train_act[0])
+                   print(train_act.shape)
+                   val = sliding_window(val, (ws, val.shape[1]), (ss, 1))
+                   print(val.shape)
                elif usage_modus=='test':
                    print('Sliding window')
-                   X_test= sliding_window(X_test, (ws, X_test.shape[1]), (ss, 1))
-                   print(X_test.shape)
+                   test= sliding_window(test, (ws, test.shape[1]), (ss, 1))
+                   print(test.shape)
            except:
                print("error in sliding window")
     
