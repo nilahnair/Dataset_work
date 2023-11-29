@@ -7,6 +7,7 @@ import pandas as pd
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.model_selection import train_test_split
 from multiprocessing import Pool
+from sliding_window_sf import sliding_window
 
 import csv
 
@@ -20,11 +21,59 @@ SUBJECT= ['SA01', 'SA02', 'SA03', 'SA04', 'SA05', 'SA06', 'SA07', 'SA08', 'SA09'
 Subject_id= {'SA01':0, 'SA02':1, 'SA03':2, 'SA04':3, 'SA05':4, 'SA06':5, 'SA07':6, 'SA08':7, 'SA09':8, 'SA10':9, 'SA11':10, 'SA12':11, 
                'SA13':12, 'SA14':13, 'SA15':14, 'SA16':15, 'SA17':16, 'SA18':17, 'SA19':18, 'SA20':19, 'SA21':20, 'SA22':21, 'SA23':22, 'SE01':23, 'SE02':24,
                'SE03':25, 'SE04':26, 'SE05':27, 'SE06':28, 'SE07':29, 'SE08':30, 'SE09':31, 'SE10':32, 'SE11':33, 'SE12':34, 'SE13':35, 'SE14':36, 'SE15':37}
-WINDOW_SIZE = 200
-STRIDE = 50
+ws = 200 #WINDOW_SIZE
+ss = 50 #STRIDE 
 SOFT_BIOMETRICS = ['age', 'height', 'weight', 'gender']
 sensor_cols = ['ADXL345_x', 'ADXL345_y', 'ADXL345_z', 'ITG3200_x', 'ITG3200_y', 'ITG3200_z', 'MMA8451Q_x', 'MMA8451Q_y', 'MMA8451Q_z']
     
+
+def find_stats(ids, activities, data_dir=None):
+    recordings= ['R01', 'R02', 'R03', 'R04', 'R05', 'R06']
+    all_segments = np.empty((0, 9))
+    for subject_id in ids:
+       print('Processing subject', subject_id)
+       subject_dir = os.path.join(DATA_DIR, subject_id)
+       file_list = os.listdir(subject_dir)
+       for act in activities:
+           #print(act)
+           for R in recordings:
+               segments=[]
+               try:
+                   file_name= "{}_{}_{}.txt".format(act, subject_id, R)
+                   print(file_name)
+                   file_path = os.path.join(subject_dir, file_name)
+                   #print(file_path)
+                   segments = process_file(file_path)
+                   #print(len(segments))
+                   segments=np.array([np.array(i) for i in segments])
+                   #print(segments.shape)
+                   #print(segments)
+                   all_segments=np.concatenate((all_segments, segments), axis=0)
+                   #print('len of all segments')
+                   #print(all_segments.shape)
+                   
+               except: 
+                   print('no file path with name', file_name)
+                   #if segments is not None:
+                    #   all_segments.extend(segments)
+                    
+    #print(all_segments.shape)
+    #numpy.array([numpy.array(xi) for xi in x])
+    
+    max_values = np.max(all_segments, axis=0)
+    print("Max values")
+    print(max_values)
+    min_values = np.min(all_segments, axis=0)
+    print("Min values")
+    print(min_values)
+    mean_values = np.mean(all_segments, axis=0)
+    print("Mean values")
+    print(mean_values)
+    std_values = np.std(all_segments, axis=0)
+    print("std values")
+    print(std_values)
+    
+    return
 
 def get_person_info():
     # Open the readme file and read the lines
@@ -84,25 +133,30 @@ def process_subject(subject_id):
     subject_dir = os.path.join(DATA_DIR, subject_id) 
     return all_segments
 
-def normalize_and_encode(all_data):
+def normalize(data):
+    
+    #max_values=[1192.0, 1032.0, 2582.0, 16098.0, 12124.0, 12585.0, 4035.0, 5511.0, 6673.0]
+    #min_values=[-986.0, -2333.0, -1785.0, -15988.0, -12732.0, -11882.0, -3757.0, -8192.0, -7582.0]
+    mean_values=np.array([3.16212380, -220.821147, -37.2032848, -4.97325388, 34.9530823, -7.05977257, -0.394311490, -864.960077, -98.0097123])
+    std_values=np.array([76.42413571, 133.73065249, 108.80401481, 664.20882435, 503.17930668, 417.85844231, 296.16101639, 517.27540723, 443.30238268])
+    
+    mean_values = np.reshape(mean_values, [1, 9])
+    std_values = np.reshape(std_values, [1, 9])
     try:
-        scaler = StandardScaler()
-        cols_to_normalize = all_data.iloc[:, :-5].columns
-        
+        mean_array = np.repeat(mean_values, data.shape[0], axis=0)
+        std_array = np.repeat(std_values, data.shape[0], axis=0)
 
-        all_data[cols_to_normalize] = scaler.fit_transform(all_data[cols_to_normalize])
+        max_values = mean_array + 2 * std_array
+        min_values = mean_array - 2 * std_array
 
-        # Encode the person IDs and soft biometric labels
-        print('Encoding labels...')
-        label_encoders = {}  
-        for col in ['person_id'] + SOFT_BIOMETRICS:
-            le = LabelEncoder()
-            all_data[col] = le.fit_transform(all_data[col])
-            label_encoders[col] = le  
-            
-    except Exception as e:
-        print("Error in normalize_and_encode")
-        return None
+        data_norm = (data - min_values) / (max_values - min_values)
+
+        data_norm[data_norm > 1] = 1
+        data_norm[data_norm < 0] = 0
+    except:
+        raise("Error in normalisation")
+
+    return data_norm
 
 def extract_features(segment):
     features = []
@@ -127,26 +181,6 @@ def rearrange_columns(df):
     cols.extend(['person_id', 'age', 'height', 'weight', 'gender'])
     return df[cols]
 
-def split_and_save_data(X, y):
-    try:
-        
-    
-        # Split the data into training and validation sets
-        X_train, X_temp, y_train, y_temp = train_test_split(X, y, test_size=0.2, random_state=42, stratify= y['person_id'])
-
-        # Split the temp data into validation and test sets
-        X_valid, X_test, y_valid, y_test = train_test_split(X_temp, y_temp, test_size=0.5, random_state=42, stratify=y_temp['person_id'])
-        
-        # Now, you can concatenate the X and y DataFrames for each split and save them to CSV
-        train_data = pd.concat([X_train, y_train], axis=1)
-        valid_data = pd.concat([X_valid, y_valid], axis=1)
-        test_data = pd.concat([X_test, y_test], axis=1)
-
-        train_data.to_csv('Sis_train_data.csv', index=False)
-        valid_data.to_csv('Sis_valid_data.csv', index=False)
-        test_data.to_csv('Sis_test_data.csv', index=False)
-    except Exception as e:
-        print("Error in split_and_save_data:")
         
 def generate_data(ids, activities, sliding_window_length, sliding_window_step, data_dir=None,
                   identity_bool=False, usage_modus='train'):
@@ -164,6 +198,20 @@ def generate_data(ids, activities, sliding_window_length, sliding_window_step, d
     @param identity_bool: selecting for identity experiment
     @param usage_modus: selecting Train, Val or testing
     '''
+    
+    if usage_modus=='trainval':
+        X_train = np.empty((0, 9))
+        act_train = np.empty((0))
+        id_train = np.empty((0))
+    
+        X_val = np.empty((0, 9))
+        act_val = np.empty((0))
+        id_val = np.empty((0))
+    
+    elif usage_modus=='test':
+        X_test = np.empty((0, 9))
+        act_test = np.empty((0))
+        id_test = np.empty((0))
     
     #counter_seq = 0
     #hist_classes_all = np.zeros((NUM_CLASSES))
@@ -183,36 +231,71 @@ def generate_data(ids, activities, sliding_window_length, sliding_window_step, d
                    file_path = os.path.join(subject_dir, file_name)
                    #print(file_path)
                    segments = process_file(file_path)
-                   print(len(segments))
+                   #print(len(segments))
                    segments=np.array([np.array(i) for i in segments])
-                   print(segments.shape)
+                   #print(segments.shape)
                    #print(segments)
                    all_segments=np.concatenate((all_segments, segments), axis=0)
-                   print('len of all segments')
-                   print(all_segments.shape)
+                   #print('len of all segments')
+                   #print(all_segments.shape)
                    
                except: 
                    print('no file path with name', file_name)
                    #if segments is not None:
                     #   all_segments.extend(segments)
+           try:
+               data_x = normalize(all_segments)
+           except:
+               print("\n3  In normalising, issues found.")
+               continue
+           frames=all_segments.shape[0]
+           if frames != 0:
+               train_no=round(0.64*frames)
+               val_no=round(0.18*frames)
+               tv= train_no+val_no
+               
+           if usage_modus=='trainval':
+               X_train = np.vstack((X_train, all_segments[0:train_no,:]))
+               #act_train = np.append(act_train, [lbls[0:train_no,0]])
+               #id_train = np.append(id_train, [lbls[0:train_no,1]])
+               print('done train')
+                            
+               X_val = np.vstack((X_val, all_segments[train_no:tv,:]))
+               #act_val = np.append(act_val, [lbls[train_no:tv,0]])
+               #id_val = np.append(id_val, [lbls[train_no:tv,1]])
+               print('done val')
+           elif usage_modus=='test':
+                X_test = np.vstack((X_test, all_segments[tv:frames,:]))
+                #act_test = np.append(act_test, [lbls[tv:frames,0]])
+                #id_test = np.append(id_test, [lbls[tv:frames,1]])
+                print('done test')
                     
-    print(all_segments.shape)
-    #numpy.array([numpy.array(xi) for xi in x])
+           print('frames')
+           print(frames)
+           if usage_modus=='trainval':
+               print('X_train')
+               print(X_train.shape)
+               print('X_val')
+               print(X_val.shape)
+           elif usage_modus=='test':
+               print('X_test')
+               print(X_test.shape)
+                    
+               
+           try: 
+               if usage_modus=='trainval':
+                   print('Sliding window')
+                   X_train = sliding_window(X_train, (ws, X_train.shape[1]), (ss, 1))
+                   print(X_train.shape)
+                   X_val = sliding_window(X_val, (ws, X_val.shape[1]), (ss, 1))
+                   print(X_val.shape)
+               elif usage_modus=='test':
+                   print('Sliding window')
+                   X_test= sliding_window(X_test, (ws, X_test.shape[1]), (ss, 1))
+                   print(X_test.shape)
+           except:
+               print("error in sliding window")
     
-    max_values = np.max(all_segments, axis=0)
-    print("Max values")
-    print(max_values)
-    min_values = np.min(all_segments, axis=0)
-    print("Min values")
-    print(min_values)
-    mean_values = np.mean(all_segments, axis=0)
-    print("Mean values")
-    print(mean_values)
-    std_values = np.std(all_segments, axis=0)
-    print("std values")
-    print(std_values)
-  
-
 
 def main():
     person_info = get_person_info()
@@ -229,7 +312,7 @@ def main():
     data_dir_val = base_directory + 'sequences_val/'
     data_dir_test = base_directory + 'sequences_test/'
     
-    generate_data(train_ids, activities, sliding_window_length=200, sliding_window_step=50, data_dir=data_dir_train, usage_modus='train')
+    generate_data(train_ids, activities, sliding_window_length=200, sliding_window_step=50, data_dir=data_dir_train, usage_modus='trainval')
     '''
     generate_data(val_ids, activties, sliding_window_length=200, sliding_window_step=50, data_dir=data_dir_val, usage_modus='val')
     generate_data(test_ids, activities, sliding_window_length=200, sliding_window_step=50, data_dir=data_dir_test, usage_modus='test')
