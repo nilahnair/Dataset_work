@@ -83,8 +83,11 @@ def reader_data(path):
     label=[]
     data = []
     with open(path, 'r') as csvfile:
+        print('check1')
         spamreader = csv.reader(csvfile, delimiter=',')
+        print('check2')
         spamreader.next()
+        print('check3')
         for row in spamreader:
             print('printing row')
             print(row)
