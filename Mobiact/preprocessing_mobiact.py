@@ -90,11 +90,11 @@ def reader_data(path):
             print('printing row')
             print(row)
             
-            row=time.append(list(map(int, row[0:2])))
+            row=time.extend(list(map(int, row[0:2])))
             print(time)
-            IMU.append(list(map(int, row[2:12])))
+            IMU.extend(list(map(int, row[2:12])))
             print(IMU)
-            label.append(row[12])
+            label.extend(row[12])
             print(label)
         
 
