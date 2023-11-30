@@ -83,7 +83,7 @@ def reader_data(path):
     label=[]
     data = []
     with open(path, 'r') as csvfile:
-        spamreader = csv.reader(csvfile, delimiter=',', quotechar='|')
+        spamreader = csv.reader(csvfile, delimiter=',')
         spamreader.next()
         for row in spamreader:
             print('printing row')
@@ -215,6 +215,7 @@ def generate_data(ids, sliding_window_length, sliding_window_step, data_dir=None
                 print("\n{}".format(file_name_data))
                 try:
                     # getting data
+                    print(FOLDER_PATH + file_name_data)
                     data = reader_data(FOLDER_PATH + file_name_data)
                     print("\nFiles loaded in modus {}\n{}".format(usage_modus, file_name_data))
                   
