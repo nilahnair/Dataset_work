@@ -84,34 +84,17 @@ def reader_data(path):
     data = []
     with open(path, 'r') as csvfile:
         spamreader = csv.reader(csvfile, delimiter=',', quotechar='|')
+        spamreader.next()
         for row in spamreader:
             print('printing row')
             print(row)
-            try:
-                if len(row) != 0:
-                    time.append(list(map(int, row[0:2])))
-                    print(time)
-                    IMU.append(list(map(int, row[2:12])))
-                    print(IMU)
-                    label.append(row[12])
-                    print(label)
-                else:
-                    continue 
-                ''' 
-                        try:
-                            time_d = datetime.datetime.strptime(row[idx_row], '%Y-%m-%d %H:%M:%S.%f')
-                            idx_row += 1
-                        except:
-                            try:
-                                time_d = datetime.datetime.strptime(row[idx_row.astype(int)], '%Y-%m-%d %H:%M:%S')
-                                idx_row += 1
-                            except:
-                                print("strange time str {}".format(time_d))
-                                continue
-                        time.append(time_d)
-                        '''
-            except:
-                print("Error in line {}".format(row))
+            
+            row=time.append(list(map(int, row[0:2])))
+            print(time)
+            IMU.append(list(map(int, row[2:12])))
+            print(IMU)
+            label.append(row[12])
+            print(label)
         
 
     if len(row) == 12:
