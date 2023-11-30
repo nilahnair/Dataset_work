@@ -94,9 +94,12 @@ def reader_data(path):
                         print(', '.join(row))
                     else:
                         if len(row) == 12:
-                            time.append(row[0:2])
-                            IMU.append(row[2:12])
+                            time.append(list(map(int, row[0:2])))
+                            print(time)
+                            IMU.append(list(map(int, row[2:12])))
+                            print(IMU)
                             label.append(row[12])
+                            print(label)
                         else:
                             continue 
                         ''' 
@@ -232,10 +235,11 @@ def generate_data(ids, sliding_window_length, sliding_window_step, data_dir=None
     all_segments = []
     for act in activities:
         print(act)
-        for recordings in range(act_record[act]):
-            print(recordings)
-            for sub in ids:
-                print(sub)
+        for sub in ids:
+            print(sub)
+            for recordings in range(act_record[act]):
+                print(recordings)
+            
                 file_name_data = "{}/{}_{}_{}_annotated.csv".format(act, act, sub, recordings)
                 print("\n{}".format(file_name_data))
                 try:
