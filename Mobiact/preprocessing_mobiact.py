@@ -110,22 +110,14 @@ def reader_data(path):
                                 continue
                         time.append(time_d)
                         '''
-                        data.append(list(map(float, row[idx_row:])))
-                        print('data size')
-                        print(data.size)
-                except:
-                    print("Error in line {}".format(row))
-            except KeyboardInterrupt:
-                print('\nYou cancelled the operation.')
-
-    if len(row) != 10:
-        imu_data = {'IMU': IMU, 'time': time, 'data': data}
-    else:
-        imu_data = {'time': time, 'data': data}
-        data_new=np.asarray(data)
-        print(data_new.shape)
+            except:
+                print("Error in line {}".format(row))
         
-    return data_new
+
+    if len(row) == 12:
+        imu_data = {'IMU': IMU, 'time': time, 'label': label}
+        
+    return imu_data
 
 
 
