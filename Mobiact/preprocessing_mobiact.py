@@ -88,20 +88,15 @@ def reader_data(path):
             print('printing row')
             print(row)
             try:
-                try:
-                    if spamreader.line_num == 1:
-                        # print('\n')
-                        print(', '.join(row))
-                    else:
-                        if len(row) == 12:
-                            time.append(list(map(int, row[0:2])))
-                            print(time)
-                            IMU.append(list(map(int, row[2:12])))
-                            print(IMU)
-                            label.append(row[12])
-                            print(label)
-                        else:
-                            continue 
+                if len(row) == 12:
+                    time.append(list(map(int, row[0:2])))
+                    print(time)
+                    IMU.append(list(map(int, row[2:12])))
+                    print(IMU)
+                    label.append(row[12])
+                    print(label)
+                else:
+                    continue 
                         ''' 
                         try:
                             time_d = datetime.datetime.strptime(row[idx_row], '%Y-%m-%d %H:%M:%S.%f')
@@ -226,11 +221,12 @@ def generate_data(ids, sliding_window_length, sliding_window_step, data_dir=None
     '''
     
     if usage_modus == 'train':
-           activities = ['STD', 'WAL', 'JOG', 'JUM', 'STU', 'STN', 'SCH', 'CSI', 'CSO']
-    elif usage_modus == 'val':
-           activities = ['STD', 'WAL', 'JOG', 'JUM', 'STU', 'STN', 'SCH', 'CSI', 'CSO']
-    elif usage_modus == 'test':
-           activities = ['STD', 'WAL', 'JOG', 'JUM', 'STU', 'STN', 'SCH', 'CSI', 'CSO']
+           #activities = ['STD', 'WAL', 'JOG', 'JUM', 'STU', 'STN', 'SCH', 'CSI', 'CSO']
+           activities = ['STD',]
+    #elif usage_modus == 'val':
+     #      activities = ['STD', 'WAL', 'JOG', 'JUM', 'STU', 'STN', 'SCH', 'CSI', 'CSO']
+    #elif usage_modus == 'test':
+     #      activities = ['STD', 'WAL', 'JOG', 'JUM', 'STU', 'STN', 'SCH', 'CSI', 'CSO']
     
     all_segments = []
     for act in activities:
@@ -391,7 +387,7 @@ def create_dataset(identity_bool = False):
     @param half: set for creating dataset with half the frequence.
     '''
     
-    train_ids=['1', '2', '3', '4', '5','6']
+    train_ids=['1', '2',]
     base_directory = '/data/nnair/idimuall/'
     data_dir_train = base_directory + 'sequences_train/'
     data_dir_val = base_directory + 'sequences_val/'
