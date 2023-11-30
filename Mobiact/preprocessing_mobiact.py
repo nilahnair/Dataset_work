@@ -58,7 +58,7 @@ def read_subject_info(file_path):
     columns = ['subject', 'age', 'height', 'weight', 'gender']
     person_info = pd.DataFrame(person_list, columns=columns)
     person_info[['age', 'height', 'weight']] = person_info[['age', 'height', 'weight']].apply(pd.to_numeric)
-    person_info['gender'] = pd.Categorical(person_info['gender'], categories=['M', 'F','Ì '])
+    person_info['gender'] = pd.Categorical(person_info['gender'], categories=['M', 'F','I'])
     return person_info
 
 
@@ -75,27 +75,33 @@ def reader_data(path):
 
     @param path: path to file
     '''
-
+    #annotated file structure: timestamp,rel_time,acc_x,acc_y,acc_z,gyro_x,gyro_y,gyro_z,azimuth,pitch,roll,label
     print('Getting data from {}'.format(path))
     counter = 0
     IMU = []
     time = []
+    label=[]
     data = []
     with open(path, 'r') as csvfile:
         spamreader = csv.reader(csvfile, delimiter=',', quotechar='|')
         for row in spamreader:
+            print('printing row')
+            print(row)
             try:
                 try:
                     if spamreader.line_num == 1:
                         # print('\n')
                         print(', '.join(row))
                     else:
-                        if len(row) != 31:
-                            idx_row = 0
+                        if len(row) != 12:
+                            idx_row = 2
+                            print('row value')
+                            print(row[idx_row])
                             IMU.append(row[idx_row])
                             idx_row += 1
                         else:
-                            idx_row = 0
+                            idx_row = 2
+                        ''' 
                         try:
                             time_d = datetime.datetime.strptime(row[idx_row], '%Y-%m-%d %H:%M:%S.%f')
                             idx_row += 1
@@ -107,13 +113,16 @@ def reader_data(path):
                                 print("strange time str {}".format(time_d))
                                 continue
                         time.append(time_d)
+                        '''
                         data.append(list(map(float, row[idx_row:])))
+                        print('data size')
+                        print(data.size)
                 except:
                     print("Error in line {}".format(row))
             except KeyboardInterrupt:
                 print('\nYou cancelled the operation.')
 
-    if len(row) != 31:
+    if len(row) != 10:
         imu_data = {'IMU': IMU, 'time': time, 'data': data}
     else:
         imu_data = {'time': time, 'data': data}
@@ -216,47 +225,33 @@ def generate_data(ids, sliding_window_length, sliding_window_step, data_dir=None
     '''
     
     if usage_modus == 'train':
-           persons = [ "S07", "S08", "S09", "S10", "S11", "S12", "S13", "S14"]
+           activities = ['STD', 'WAL', 'JOG', 'JUM', 'STU', 'STN', 'SCH', 'CSI', 'CSO']
     elif usage_modus == 'val':
-           persons = ["S07", "S08", "S09", "S10", "S11", "S12", "S13","S14"]
+           activities = ['STD', 'WAL', 'JOG', 'JUM', 'STU', 'STN', 'SCH', 'CSI', 'CSO']
     elif usage_modus == 'test':
-           persons = ["S07", "S08", "S09", "S10", "S11", "S12", "S13","S14"]
-    #persons = ["S07", "S08", "S09", "S10", "S11", "S12", "S13", "S14"]
+           activities = ['STD', 'WAL', 'JOG', 'JUM', 'STU', 'STN', 'SCH', 'CSI', 'CSO']
     
-    ID = {"S07": 0, "S08": 1, "S09": 2, "S10": 3, "S11": 4, "S12":5, "S13": 6, "S14": 7}
-    train_ids = ["R01", "R02", "R03", "R04", "R05", "R06", "R07", "R08", "R09", "R10", 
-                 "R13", "R14", "R16", "R17", "R18", "R19", "R20", "R21", "R22", "R23", 
-                 "R24", "R25", "R26", "R27", "R28", "R29", "R30"]
-    val_ids = ["R11","R12"]
-    test_ids = ["R15"]
-'''
-    for P in persons:
-       if usage_modus == 'train':
-           recordings = train_ids
-       elif usage_modus == 'val':
-           recordings = val_ids
-       elif usage_modus == 'test':
-           recordings =  test_ids 
-            
-       print("\nModus {} \n{}".format(usage_modus, recordings))
-       for R in recordings:
-           try:
-               S = SCENARIO[R]
-               file_name_data = "{}/{}_{}_{}.csv".format(P, S, P, R)
-               file_name_label = "{}/{}_{}_{}_labels.csv".format(P, S, P, R)
-               print("\n{}\n{}".format(file_name_data, file_name_label))
-               try:
-                  # getting data
-                  data = reader_data(FOLDER_PATH + file_name_data)
-                  print("\nFiles loaded in modus {}\n{}".format(usage_modus, file_name_data))
+    all_segments = []
+    for act in activities:
+        print(act)
+        for recordings in range(act_record[act]):
+            print(recordings)
+            for sub in ids:
+                print(sub)
+                file_name_data = "{}/{}_{}_{}_annotated.csv".format(act, act, sub, recordings)
+                print("\n{}".format(file_name_data))
+                try:
+                    # getting data
+                    data = reader_data(FOLDER_PATH + file_name_data)
+                    print("\nFiles loaded in modus {}\n{}".format(usage_modus, file_name_data))
                   
-                  data_x = data
+                    data_x = data
                   
-                  print("\nFiles loaded")
-               except:
-                  print("\n1 In loading data,  in file {}".format(FOLDER_PATH + file_name_data))
-                  continue
-
+                    print("\nFiles loaded")
+                except:
+                    print("\n1 In loading data,  in file {}".format(FOLDER_PATH + file_name_data))
+                    continue
+    '''
                try:
                   # Getting labels and attributes
                   labels = csv_reader.reader_labels(FOLDER_PATH + file_name_label)
@@ -394,22 +389,25 @@ def create_dataset(identity_bool = False):
     @param half: set for creating dataset with half the frequence.
     '''
     
-    #annotated file structure: timestamp,rel_time,acc_x,acc_y,acc_z,gyro_x,gyro_y,gyro_z,azimuth,pitch,roll,label
-    train_id=['1', '2', '3', '4', '5','6']
-    
-    print("Reading subject info...")
-    start_time = time.time()
-    subject_info = read_subject_info(SUBJECT_INFO_FILE)
-    print(f"Subject info read in {time.time() - start_time:.2f} seconds.")
-    print(subject_info)
-    return
-
-'''
+    train_ids=['1', '2', '3', '4', '5','6']
     base_directory = '/data/nnair/idimuall/'
     data_dir_train = base_directory + 'sequences_train/'
     data_dir_val = base_directory + 'sequences_val/'
     data_dir_test = base_directory + 'sequences_test/'
     
+    print("Reading subject info...")
+    start_time = time.time()
+    subject_info = read_subject_info(SUBJECT_INFO_FILE)
+    print(f"Subject info read in {time.time() - start_time:.2f} seconds.")
+    #print(subject_info)
+    generate_data(train_ids, sliding_window_length=200, sliding_window_step=50, data_dir=data_dir_train, usage_modus='train')
+    
+    
+    return
+
+
+    
+'''   
     generate_data(train_ids, sliding_window_length=100, sliding_window_step=12, data_dir=data_dir_train, usage_modus='train')
     generate_data(val_ids, sliding_window_length=100, sliding_window_step=12, data_dir=data_dir_val, usage_modus='val')
     generate_data(test_ids, sliding_window_length=100, sliding_window_step=12, data_dir=data_dir_test, usage_modus='test')
