@@ -97,7 +97,7 @@ def reader_data(path):
                     print(label)
                 else:
                     continue 
-                        ''' 
+                ''' 
                         try:
                             time_d = datetime.datetime.strptime(row[idx_row], '%Y-%m-%d %H:%M:%S.%f')
                             idx_row += 1
