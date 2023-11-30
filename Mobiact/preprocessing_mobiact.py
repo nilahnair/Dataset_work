@@ -225,7 +225,7 @@ def generate_data(ids, sliding_window_length, sliding_window_step, data_dir=None
         print(act)
         for sub in ids:
             print(sub)
-            for recordings in range(1:act_record[act]):
+            for recordings in range(1,act_record[act]):
                 print(recordings)
             
                 file_name_data = "{}/{}_{}_{}_annotated.csv".format(act, act, sub, recordings)
