@@ -93,14 +93,12 @@ def reader_data(path):
                         # print('\n')
                         print(', '.join(row))
                     else:
-                        if len(row) != 12:
-                            idx_row = 2
-                            print('row value')
-                            print(row[idx_row])
-                            IMU.append(row[idx_row])
-                            idx_row += 1
+                        if len(row) == 12:
+                            time.append(row[0:2])
+                            IMU.append(row[2:12])
+                            label.append(row[12])
                         else:
-                            idx_row = 2
+                            continue 
                         ''' 
                         try:
                             time_d = datetime.datetime.strptime(row[idx_row], '%Y-%m-%d %H:%M:%S.%f')
