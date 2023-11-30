@@ -88,14 +88,11 @@ def reader_data(path):
         for row in spamreader:
             print('printing row')
             print(row)
-            print(row[0:2])
-            print(row[2:11])
-            print(row[11])
             time.extend(list(map(int, row[0:2])))
             print(time)
-            IMU.extend(list(map(int, row[2:12])))
+            IMU.extend(list(map(int, row[2:11])))
             print(IMU)
-            label.extend(row[12])
+            label.extend(row[11])
             print(label)
         
 
