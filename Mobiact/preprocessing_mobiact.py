@@ -88,7 +88,7 @@ def reader_data(path):
             print('printing row')
             print(row)
             try:
-                if len(row) == 12:
+                if len(row) == 13:
                     time.append(list(map(int, row[0:2])))
                     print(time)
                     IMU.append(list(map(int, row[2:12])))
