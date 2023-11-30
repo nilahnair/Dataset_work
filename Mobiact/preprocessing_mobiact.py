@@ -85,12 +85,11 @@ def reader_data(path):
     with open(path, 'r') as csvfile:
         spamreader = csv.reader(csvfile, delimiter=',')
         next(spamreader)
-        print('check3')
         for row in spamreader:
             print('printing row')
             print(row)
             
-            row=time.extend(list(map(int, row[0:2])))
+            time.extend(list(map(int, row[0:2])))
             print(time)
             IMU.extend(list(map(int, row[2:12])))
             print(IMU)
