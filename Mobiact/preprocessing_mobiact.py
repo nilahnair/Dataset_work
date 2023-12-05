@@ -99,9 +99,9 @@ def reader_data(path):
                     print('check4')
                 else:
                     print('check5')
-                    t =list(map(int, row[0:2]))
+                    time.extend(list(map(int, row[0:2])))
                     print('check5')
-                    time_test.append(t)
+                    time_test.append(time)
                 
                     print('check6')
                     IMU.extend(list(map(float, row[2:11])))
@@ -110,12 +110,11 @@ def reader_data(path):
                     
                     print('check7')
                     label.extend([row[11]])
-                    print('check7')
                     label_test.append(label)
                     
                     print('check8')
             except:
-                    print("Error in line {}".format(row))
+                    break
         
         print(len(time))
         print(time[0])
