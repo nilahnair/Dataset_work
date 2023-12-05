@@ -99,7 +99,7 @@ def reader_data(path):
                     print('check4')
                 else:
                     print('check5')
-                    time=list(map(int, row[0:2]))
+                    time=list(map(float, row[0:2]))
                     print(time)
                     time_test.extend(time)
                     print(time_test)
