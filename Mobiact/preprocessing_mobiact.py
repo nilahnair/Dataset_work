@@ -99,9 +99,9 @@ def reader_data(path):
                     print('check4')
                 else:
                     print('check5')
-                    time.extend(list(map(int, row[0:2])))
+                    t =list(map(int, row[0:2]))
                     print('check5')
-                    time_test.append(time)
+                    time_test.append(t)
                 
                     print('check6')
                     IMU.extend(list(map(float, row[2:11])))
