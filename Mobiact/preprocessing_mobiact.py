@@ -84,18 +84,14 @@ def reader_data(path):
     data = []
     with open(path, 'r') as csvfile:
         spamreader = csv.reader(csvfile, delimiter=',')
+        print(spamreader.shape)
         next(spamreader)
+        print(spamreader.shape)
         for row in spamreader:
-            print('printing row')
-            print(row)
             time.extend(list(map(int, row[0:2])))
-            print(time)
             IMU.extend(list(map(float, row[2:11])))
-            print(IMU)
             label.extend([row[11]])
-            print(label)
-        
-
+            
     if len(row) == 12:
         imu_data = {'IMU': IMU, 'time': time, 'label': label}
         
