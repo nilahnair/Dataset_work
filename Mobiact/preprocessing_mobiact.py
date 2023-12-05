@@ -78,6 +78,10 @@ def reader_data(path):
     #annotated file structure: timestamp,rel_time,acc_x,acc_y,acc_z,gyro_x,gyro_y,gyro_z,azimuth,pitch,roll,label
     print('Getting data from {}'.format(path))
     counter = 0
+    IMU_test = []
+    time_test = []
+    label_test=[]
+    data = []
     IMU = []
     time = []
     label=[]
@@ -95,14 +99,17 @@ def reader_data(path):
                     print('check4')
                 else:
                     print('check5')
-                    time.append(list(map(int, row[0:2])))
-                    print(time)
+                    time.extend(list(map(int, row[0:2])))
+                    time_test.append(time)
+                
                     print('check6')
-                    IMU.append(list(map(float, row[2:11])))
-                    print(IMU)
+                    IMU.extend(list(map(float, row[2:11])))
+                    IMU_test.append(IMU)
+                    
                     print('check7')
-                    label.append([row[11]])
-                    print(label)
+                    label.extend([row[11]])
+                    label_test.append(label)
+                    
                     print('check8')
             except:
                     print("Error in line {}".format(row))
@@ -113,6 +120,13 @@ def reader_data(path):
         print(IMU[0])
         print(len(label))
         print(label[0])
+        print('test')
+        print(len(time_test))
+        print(time_test[0])
+        print(len(IMU_test))
+        print(IMU_test[0])
+        print(len(label_test))
+        print(label_test[0])
             
     if len(row) == 12:
         imu_data = {'IMU': IMU, 'time': time, 'label': label}
