@@ -87,19 +87,19 @@ def reader_data(path):
         row_count = sum(1 for row in spamreader) 
         print(row_count)
         for row in spamreader:
+            print('check1')
             try:
+                print('check2')
                 if spamreader.line_num == 1:
+                    print('check3')
                     # print('\n')
                     print(', '.join(row))
+                    print('check4')
                 else:
-                    if len(row) != 13:
-                        idx_row = 0
-                        time.extend(list(map(int, row[0:2])))
-                        IMU.extend(list(map(float, row[2:11])))
-                        label.extend([row[11]])
-                        idx_row += 1
-                    else:
-                        idx_row = 0
+                    print('check5')
+                    time.extend(list(map(int, row[0:2])))
+                    IMU.extend(list(map(float, row[2:11])))
+                    label.extend([row[11]])
             except:
                     print("Error in line {}".format(row))
         
