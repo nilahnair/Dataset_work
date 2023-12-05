@@ -86,14 +86,22 @@ def reader_data(path):
         spamreader = csv.reader(csvfile, delimiter=',')
         row_count = sum(1 for row in spamreader) 
         print(row_count)
-        next(spamreader)
-        print('after next')
-        row_count = sum(1 for row in spamreader) 
+        first_row=1
         print(row_count)
         for row in spamreader:
-            time.extend(list(map(int, row[0:2])))
-            IMU.extend(list(map(float, row[2:11])))
-            label.extend([row[11]])
+            if first_row==1:
+                first_row=0
+                print('skipped')
+            else:
+                time.extend(list(map(int, row[0:2])))
+                IMU.extend(list(map(float, row[2:11])))
+                label.extend([row[11]])
+        print(len(time))
+        print(time[0])
+        print(len(IMU))
+        print(IMU[0])
+        print(len(label))
+        print(label[0])
             
     if len(row) == 12:
         imu_data = {'IMU': IMU, 'time': time, 'label': label}
