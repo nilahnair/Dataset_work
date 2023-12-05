@@ -84,8 +84,6 @@ def reader_data(path):
     data = []
     with open(path, 'r') as csvfile:
         spamreader = csv.reader(csvfile, delimiter=',')
-        row_count = sum(1 for row in spamreader) 
-        print(row_count)
         for row in spamreader:
             print('check1')
             try:
