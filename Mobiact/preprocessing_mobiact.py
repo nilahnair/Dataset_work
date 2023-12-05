@@ -101,7 +101,7 @@ def reader_data(path):
                     print('check5')
                     time=list(map(int, row[0:2]))
                     print(time)
-                    time_test.append(time)
+                    time_test.extend(time)
                     print(time_test)
                 
                     print('check6')
