@@ -100,14 +100,17 @@ def reader_data(path):
                 else:
                     print('check5')
                     time.extend(list(map(int, row[0:2])))
+                    print('check5')
                     time_test.append(time)
                 
                     print('check6')
                     IMU.extend(list(map(float, row[2:11])))
+                    print('check6')
                     IMU_test.append(IMU)
                     
                     print('check7')
                     label.extend([row[11]])
+                    print('check7')
                     label_test.append(label)
                     
                     print('check8')
