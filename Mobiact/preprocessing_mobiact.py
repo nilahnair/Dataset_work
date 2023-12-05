@@ -81,11 +81,11 @@ def reader_data(path):
     IMU_test = []
     time_test = []
     label_test=[]
-    data = []
-    IMU = []
-    time = []
-    label=[]
-    data = []
+    #data = []
+    #IMU = []
+    #time = []
+    #label=[]
+    #data = []
     with open(path, 'r') as csvfile:
         spamreader = csv.reader(csvfile, delimiter=',')
         for row in spamreader:
@@ -99,19 +99,19 @@ def reader_data(path):
                     print('check4')
                 else:
                     print('check5')
-                    time.extend(list(map(int, row[0:2])))
+                    time=list(map(int, row[0:2]))
                     print(time)
                     time_test.append(time)
                     print(time_test)
                 
                     print('check6')
-                    IMU.extend(list(map(float, row[2:11])))
+                    IMU=list(map(float, row[2:11]))
                     print(IMU)
                     IMU_test.append(IMU)
                     print(IMU_test)
                     
                     print('check7')
-                    label.extend([row[11]])
+                    label=[row[11]]
                     print(label)
                     label_test.append(label)
                     print(label_test)
