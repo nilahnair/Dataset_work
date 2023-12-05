@@ -84,9 +84,12 @@ def reader_data(path):
     data = []
     with open(path, 'r') as csvfile:
         spamreader = csv.reader(csvfile, delimiter=',')
-        print(spamreader.shape)
+        row_count = sum(1 for row in spamreader) 
+        print(row_count)
         next(spamreader)
-        print(spamreader.shape)
+        print('after next')
+        row_count = sum(1 for row in spamreader) 
+        print(row_count)
         for row in spamreader:
             time.extend(list(map(int, row[0:2])))
             IMU.extend(list(map(float, row[2:11])))
