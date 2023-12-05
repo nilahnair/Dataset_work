@@ -87,7 +87,6 @@ def reader_data(path):
         row_count = sum(1 for row in spamreader) 
         print(row_count)
         first_row=1
-        print(row_count)
         for row in spamreader:
             if first_row==1:
                 first_row=0
