@@ -93,7 +93,7 @@ def reader_data(path):
             IMU.extend(list(map(float, row[2:11])))
             print(IMU)
             print(row[11])
-            label.extend(map(str, row[11]))
+            label.extend(row[11])
             print(label)
         
 
