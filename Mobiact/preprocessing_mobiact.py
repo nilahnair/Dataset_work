@@ -118,6 +118,7 @@ def reader_data(path):
                     
                     print('check8')
             except:
+                    print("Error in line {}".format(row))
                     break
         
         print(len(time))
