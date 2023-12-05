@@ -107,13 +107,13 @@ def reader_data(path):
                     print('check6')
                     IMU=list(map(float, row[2:11]))
                     print(IMU)
-                    IMU_test.append(IMU)
+                    IMU_test.extend(IMU)
                     print(IMU_test)
                     
                     print('check7')
                     label=[row[11]]
                     print(label)
-                    label_test.append(label)
+                    label_test.extend(label)
                     print(label_test)
                     
                     print('check8')
