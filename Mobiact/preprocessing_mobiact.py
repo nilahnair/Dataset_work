@@ -96,10 +96,13 @@ def reader_data(path):
                 else:
                     print('check5')
                     time.append(list(map(int, row[0:2])))
+                    print(time)
                     print('check6')
                     IMU.append(list(map(float, row[2:11])))
+                    print(IMU)
                     print('check7')
                     label.append([row[11]])
+                    print(label)
                     print('check8')
             except:
                     print("Error in line {}".format(row))
