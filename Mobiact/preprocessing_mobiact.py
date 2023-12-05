@@ -86,15 +86,23 @@ def reader_data(path):
         spamreader = csv.reader(csvfile, delimiter=',')
         row_count = sum(1 for row in spamreader) 
         print(row_count)
-        first_row=1
         for row in spamreader:
-            if first_row==1:
-                first_row=0
-                print('skipped')
-            else:
-                time.extend(list(map(int, row[0:2])))
-                IMU.extend(list(map(float, row[2:11])))
-                label.extend([row[11]])
+            try:
+                if spamreader.line_num == 1:
+                    # print('\n')
+                    print(', '.join(row))
+                else:
+                    if len(row) != 13:
+                        idx_row = 0
+                        time.extend(list(map(int, row[0:2])))
+                        IMU.extend(list(map(float, row[2:11])))
+                        label.extend([row[11]])
+                        idx_row += 1
+                    else:
+                        idx_row = 0
+            except:
+                    print("Error in line {}".format(row))
+        
         print(len(time))
         print(time[0])
         print(len(IMU))
