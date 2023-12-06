@@ -100,34 +100,34 @@ def reader_data(path):
                 else:
                     print('check5')
                     time=list(map(float, row[0:2]))
-                    print(time)
+                    #print(time)
                     time_test.extend(time)
-                    print(time_test)
+                    #print(time_test)
                 
                     print('check6')
                     IMU=list(map(float, row[2:11]))
-                    print(IMU)
+                    #print(IMU)
                     IMU_test.extend(IMU)
-                    print(IMU_test)
+                    #print(IMU_test)
                     
                     print('check7')
                     label=[row[11]]
-                    print(label)
+                    #print(label)
                     label_test.extend(label)
-                    print(label_test)
+                    #print(label_test)
                     
                     print('check8')
             except:
                     print("Error in line {}".format(row))
                     break
-        
+        print('length of individuals')
         print(len(time))
         print(time[0])
         print(len(IMU))
         print(IMU[0])
         print(len(label))
         print(label[0])
-        print('test')
+        print('length of test variables')
         print(len(time_test))
         print(time_test[0])
         print(len(IMU_test))
