@@ -101,19 +101,19 @@ def reader_data(path):
                     print('check5')
                     time=list(map(float, row[0:2]))
                     #print(time)
-                    time_test.extend(time)
+                    time_test.append(time)
                     #print(time_test)
                 
                     print('check6')
                     IMU=list(map(float, row[2:11]))
                     #print(IMU)
-                    IMU_test.extend(IMU)
+                    IMU_test.append(IMU)
                     #print(IMU_test)
                     
                     print('check7')
                     label=[row[11]]
                     #print(label)
-                    label_test.extend(label)
+                    label_test.append(label)
                     #print(label_test)
                     
                     print('check8')
