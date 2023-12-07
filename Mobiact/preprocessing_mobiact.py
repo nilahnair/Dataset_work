@@ -81,62 +81,28 @@ def reader_data(path):
     IMU_test = []
     time_test = []
     label_test=[]
-    #data = []
-    #IMU = []
-    #time = []
-    #label=[]
-    #data = []
     with open(path, 'r') as csvfile:
         spamreader = csv.reader(csvfile, delimiter=',')
         for row in spamreader:
-            print('check1')
             try:
-                print('check2')
                 if spamreader.line_num == 1:
-                    print('check3')
                     # print('\n')
                     print(', '.join(row))
-                    print('check4')
                 else:
-                    print('check5')
                     time=list(map(float, row[0:2]))
-                    #print(time)
                     time_test.append(time)
-                    #print(time_test)
-                
-                    print('check6')
+                    
                     IMU=list(map(float, row[2:11]))
-                    #print(IMU)
                     IMU_test.append(IMU)
-                    #print(IMU_test)
                     
-                    print('check7')
                     label=[row[11]]
-                    #print(label)
                     label_test.append(label)
-                    #print(label_test)
                     
-                    print('check8')
             except:
                     print("Error in line {}".format(row))
                     break
-        print('length of individuals')
-        print(len(time))
-        print(time[0])
-        print(len(IMU))
-        print(IMU[0])
-        print(len(label))
-        print(label[0])
-        print('length of test variables')
-        print(len(time_test))
-        print(time_test[0])
-        print(len(IMU_test))
-        print(IMU_test[0])
-        print(len(label_test))
-        print(label_test[0])
-            
-    if len(row) == 12:
-        imu_data = {'IMU': IMU, 'time': time, 'label': label}
+    
+    imu_data = {'IMU': IMU_test, 'time': time_test, 'label': label_test}
         
     return imu_data
 
@@ -234,8 +200,8 @@ def generate_data(ids, sliding_window_length, sliding_window_step, data_dir=None
     '''
     
     if usage_modus == 'train':
-           #activities = ['STD', 'WAL', 'JOG', 'JUM', 'STU', 'STN', 'SCH', 'CSI', 'CSO']
-           activities = ['STD',]
+           activities = ['STD', 'WAL', 'JOG', 'JUM', 'STU', 'STN', 'SCH', 'CSI', 'CSO']
+           #activities = ['STD',]
     #elif usage_modus == 'val':
      #      activities = ['STD', 'WAL', 'JOG', 'JUM', 'STU', 'STN', 'SCH', 'CSI', 'CSO']
     #elif usage_modus == 'test':
@@ -257,7 +223,8 @@ def generate_data(ids, sliding_window_length, sliding_window_step, data_dir=None
                     data = reader_data(FOLDER_PATH + file_name_data)
                     print("\nFiles loaded in modus {}\n{}".format(usage_modus, file_name_data))
                   
-                    data_x = data
+                    all_segments.append(data['IMU'])
+                    print(len(all_segments))
                   
                     print("\nFiles loaded")
                 except:
