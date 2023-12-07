@@ -101,7 +101,8 @@ def reader_data(path):
             except:
                     print("Error in line {}".format(row))
                     break
-    
+    print('shape of the IMU_test')
+    print(len(IMU_test))
     imu_data = {'IMU': IMU_test, 'time': time_test, 'label': label_test}
         
     return imu_data
@@ -222,8 +223,9 @@ def generate_data(ids, sliding_window_length, sliding_window_step, data_dir=None
                     print(FOLDER_PATH + file_name_data)
                     data = reader_data(FOLDER_PATH + file_name_data)
                     print("\nFiles loaded in modus {}\n{}".format(usage_modus, file_name_data))
-                  
+                    
                     all_segments.append(data['IMU'])
+                    print('new size of all_segments')
                     print(len(all_segments))
                   
                     print("\nFiles loaded")
