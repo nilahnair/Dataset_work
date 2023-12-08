@@ -227,7 +227,7 @@ def generate_data(ids, sliding_window_length, sliding_window_step, data_dir=None
                     print(len(data['IMU']))
                     all_segments = np.vstack((all_segments, data['IMU']))
                     print('new size of all_segments')
-                    print(len(all_segments))
+                    print(all_segments.shape)
                   
                     print("\nFiles loaded")
                 except:
