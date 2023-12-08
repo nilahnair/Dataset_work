@@ -208,7 +208,7 @@ def generate_data(ids, sliding_window_length, sliding_window_step, data_dir=None
     #elif usage_modus == 'test':
      #      activities = ['STD', 'WAL', 'JOG', 'JUM', 'STU', 'STN', 'SCH', 'CSI', 'CSO']
     
-    all_segments = []
+    all_segments = np.empty((0, 9))
     for act in activities:
         print(act)
         for sub in ids:
