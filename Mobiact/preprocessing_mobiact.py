@@ -235,18 +235,7 @@ def generate_data(ids, sliding_window_length, sliding_window_step, data_dir=None
                 except:
                     print("\n1 In loading data,  in file {}".format(FOLDER_PATH + file_name_data))
                     continue
-    max_values = np.max(all_segments, axis=0)
-    print("Max values")
-    print(max_values)
-    min_values = np.min(all_segments, axis=0)
-    print("Min values")
-    print(min_values)
-    mean_values = np.mean(all_segments, axis=0)
-    print("Mean values")
-    print(mean_values)
-    std_values = np.std(all_segments, axis=0)
-    print("std values")
-    print(std_values)
+    
     '''
                try:
                   # Getting labels and attributes
@@ -431,19 +420,14 @@ def norm_mbientlab(data):
     @return data_norm: Normalized sensor data
     """
 
-    mean_values = np.array([-0.56136913,  0.23381773,  0.3838226,   0.79076586,  0.45813304, -0.70334326,
-                            0.03523825,  1.00726919, -0.1427787,   0.32435255,  0.55939433, -1.30199178,
-                            -0.96324657, -0.09888434,  0.12263245, -0.22261515,  0.8984959,   0.49177392,
-                            -0.59227687, -0.24910351,  0.43490187, -0.35732476,  0.8924354,   1.02112235,
-                            -0.23097866, -0.85492054, -0.20215291,  0.0394256,   0.11252314,  0.5274977])
-    mean_values = np.reshape(mean_values, [1, 30])
-
-    std_values = np.array([0.42772949,  0.52758021,  0.46414677, 57.27246626, 72.281297,   59.67808402,
-                           0.48215708,  0.23598994,  0.31527504, 28.65629199, 59.30216666, 58.69912234,
-                           0.14558289,  0.21995655,  0.29484591, 39.2756242,  19.63945915, 18.32191831,
-                           0.42880226,  0.51087836,  0.42606367, 57.17931987, 74.60050755, 62.19641315,
-                           0.68380897,  0.42066544,  0.32898669, 35.61022222, 55.83724424, 59.23920043])
-    std_values = np.reshape(std_values, [1, 30])
+    max_values= [ 19.53466397, 19.59746992, 19.27203208, 10.006583, 10.008111, 9.938472, 360.0, 179.99995, 89.948]
+    min_values= [ -19.5243695, -19.60940892, -18.97174136, -10.007805, -10.008416, -9.990396, -89.79765, -179.9995, -89.852516]
+    mean_values=[ 0.265079537, 7.13106528, 0.387973281, -0.0225606363, -0.00302826137,  0.0131514254,  178.629895, -67.8435738, 2.02923485]
+    std_values=[ 3.49444826, 6.70119943, 3.31003981, 1.1238746, 1.12533643, 0.72129725, 105.81241608, 58.62837783, 17.58456297]
+    
+    mean_values = np.reshape(mean_values, [1, 9])
+    
+    std_values = np.reshape(std_values, [1, 9])
 
     mean_array = np.repeat(mean_values, data.shape[0], axis=0)
     std_array = np.repeat(std_values, data.shape[0], axis=0)
