@@ -235,6 +235,18 @@ def generate_data(ids, sliding_window_length, sliding_window_step, data_dir=None
                 except:
                     print("\n1 In loading data,  in file {}".format(FOLDER_PATH + file_name_data))
                     continue
+    max_values = np.max(all_segments, axis=0)
+    print("Max values")
+    print(max_values)
+    min_values = np.min(all_segments, axis=0)
+    print("Min values")
+    print(min_values)
+    mean_values = np.mean(all_segments, axis=0)
+    print("Mean values")
+    print(mean_values)
+    std_values = np.std(all_segments, axis=0)
+    print("std values")
+    print(std_values)
     '''
                try:
                   # Getting labels and attributes
