@@ -224,7 +224,8 @@ def generate_data(ids, sliding_window_length, sliding_window_step, data_dir=None
                     data = reader_data(FOLDER_PATH + file_name_data)
                     print("\nFiles loaded in modus {}\n{}".format(usage_modus, file_name_data))
                     
-                    all_segments.append(data['IMU'])
+                    print(len(data['IMU']))
+                    all_segments = np.vstack((all_segments, data['IMU']))
                     print('new size of all_segments')
                     print(len(all_segments))
                   
