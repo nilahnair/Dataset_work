@@ -12,7 +12,7 @@ import os
 import sys
 import matplotlib.pyplot as plt
 import datetime
-#from sliding_window import sliding_window
+from sliding_window_mobi import sliding_window
 import pickle
 import time
 import pandas as pd
@@ -203,13 +203,13 @@ def generate_data(ids, sliding_window_length, sliding_window_step, base_director
     data_dir_val = base_directory + 'sequences_val/'
     data_dir_test = base_directory + 'sequences_test/'
     
-    if usage_modus == 'train':
+    if usage_modus == 'trainval':
            activities = ['STD', 'WAL', 'JOG', 'JUM', 'STU', 'STN', 'SCH', 'CSI', 'CSO']
            #activities = ['STD',]
     #elif usage_modus == 'val':
      #      activities = ['STD', 'WAL', 'JOG', 'JUM', 'STU', 'STN', 'SCH', 'CSI', 'CSO']
-    #elif usage_modus == 'test':
-     #      activities = ['STD', 'WAL', 'JOG', 'JUM', 'STU', 'STN', 'SCH', 'CSI', 'CSO']
+    elif usage_modus == 'test':
+          activities = ['STD', 'WAL', 'JOG', 'JUM', 'STU', 'STN', 'SCH', 'CSI', 'CSO']
     
     all_segments = np.empty((0, 9))
     if usage_modus=='trainval':
@@ -522,6 +522,7 @@ def create_dataset(identity_bool = False):
             '41', '42', '43', '44', '45', '46', '47', '48', '49', '50', 
             '51', '52', '53', '54', '55', '56', '58', '59', '60',
             '61', '62', '63', '64', '65', '66', '67']
+    test_ids=train_ids
     
     base_directory = '/data/nnair/mobiact/'
     
@@ -532,7 +533,7 @@ def create_dataset(identity_bool = False):
     print(f"Subject info read in {time.time() - start_time:.2f} seconds.")
     #print(subject_info)
     generate_data(train_ids, sliding_window_length=200, sliding_window_step=50, base_directory=base_directory, usage_modus='trainval')
-    
+    generate_data(test_ids, sliding_window_length=200, sliding_window_step=50, base_directory=base_directory, usage_modus='test')
     
     return
 
