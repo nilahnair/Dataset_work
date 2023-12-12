@@ -183,8 +183,8 @@ def divide_x_y(data):
 ################
 # Generate data
 #################
-def generate_data(ids, sliding_window_length, sliding_window_step, data_dir=None,
-                  identity_bool=False, usage_modus='train'):
+def generate_data(ids, sliding_window_length, sliding_window_step, base_directory=None,
+                  identity_bool=False, usage_modus='trainval'):
     '''
     creates files for each of the sequences, which are extracted from a file
     following a sliding window approach
@@ -199,6 +199,9 @@ def generate_data(ids, sliding_window_length, sliding_window_step, data_dir=None
     @param identity_bool: selecting for identity experiment
     @param usage_modus: selecting Train, Val or testing
     '''
+    data_dir_train = base_directory + 'sequences_train/'
+    data_dir_val = base_directory + 'sequences_val/'
+    data_dir_test = base_directory + 'sequences_test/'
     
     if usage_modus == 'train':
            activities = ['STD', 'WAL', 'JOG', 'JUM', 'STU', 'STN', 'SCH', 'CSI', 'CSO']
@@ -240,8 +243,8 @@ def generate_data(ids, sliding_window_length, sliding_window_step, data_dir=None
                     
                     IMU=np.array(data['IMU'])
                     all_segments = np.vstack((all_segments, IMU))
-                    
-                    print("\nFiles loaded")
+                    all_segments = norm_mobi(all_segments)
+                    print("\nFiles loaded and normalised")
                     
                 except:
                     print("\n1 In loading data,  in file {}".format(FOLDER_PATH + file_name_data))
@@ -253,12 +256,7 @@ def generate_data(ids, sliding_window_length, sliding_window_step, data_dir=None
                 val_no=round(0.15*frames)
                 tv= train_no+val_no
                 
-            print('confirming size of the train and val labels')
-            check= np.full((train_no), act)
-            check2=np.full((val_no), act)
-            print(check.shape)
-            print(check2.shape)
-            print(frames-tv)
+            print('train and val labels split')
             
             if usage_modus=='trainval':
                 X_train = np.vstack((X_train, all_segments[0:train_no,:]))
@@ -272,9 +270,112 @@ def generate_data(ids, sliding_window_length, sliding_window_step, data_dir=None
                 print('done val')
             elif usage_modus=='test':
                 X_test = np.vstack((X_test, all_segments[tv:frames,:]))
-                act_test = np.append(act_test, np.full((val_no), act))
-                id_test = np.append(id_test, np.full((val_no), sub))
+                act_test = np.append(act_test, np.full((frames-tv), act))
+                id_test = np.append(id_test, np.full((frames-tv), sub))
                 print('done test')
+    
+    try: 
+        if usage_modus=='trainval':
+            data_train, act_train, act_all_train, labelid_train, labelid_all_train = opp_sliding_window(X_train, act_train, id_train, label_pos_end = False)
+            data_val, act_val, act_all_val, labelid_val, labelid_all_val = opp_sliding_window(X_val, act_val, id_val, label_pos_end = False)
+        elif usage_modus=='test':
+            data_test, act_test, act_all_test, labelid_test, labelid_all_test = opp_sliding_window(X_test, act_test, id_test, label_pos_end = False)
+    except:
+        print("error in sliding window")
+        
+    try:
+        
+        print("window extraction begining")
+        
+        print("training data save")
+        if usage_modus=='train':
+            print("target file name")
+            print(data_dir_train)
+            counter_seq = 0
+            for f in range(data_train.shape[0]):
+                try:
+                    sys.stdout.write('\r' + 'Creating sequence file '
+                                     'number {} with id {}'.format(f, counter_seq))
+                    sys.stdout.flush()
+                    
+                    # print "Creating sequence file number {} with id {}".format(f, counter_seq)
+                    seq = np.reshape(data_train[f], newshape = (1, data_train.shape[1], data_train.shape[2]))
+                    seq = np.require(seq, dtype=np.float)
+                    # Storing the sequences
+                    #obj = {"data": seq, "label": labelid}
+                    print("input values are")
+                    print(seq.shape)
+                    print(act_train[f])
+                    print(labelid_train[f])
+                    obj = {"data": seq, "act_label": act_train[f], "act_labels_all": act_all_train[f], "label": labelid_train[f]}
+                    
+                    f = open(os.path.join(data_dir_train, 'seq_{0:06}.pkl'.format(counter_seq)), 'wb')
+                    pickle.dump(obj, f, protocol=pickle.HIGHEST_PROTOCOL)
+                    f.close()
+
+                    counter_seq += 1
+                except:
+                    raise('\nError adding the seq')
+                
+            print("val data save")
+            print("target file name")
+            print(data_dir_val)
+            counter_seq = 0
+            for f in range(data_val.shape[0]):
+                try:
+                    sys.stdout.write('\r' + 'Creating sequence file '
+                                     'number {} with id {}'.format(f, counter_seq))
+                    sys.stdout.flush()
+
+                    # print "Creating sequence file number {} with id {}".format(f, counter_seq)
+                    seq = np.reshape(data_val[f], newshape = (1, data_val.shape[1], data_val.shape[2]))
+                    seq = np.require(seq, dtype=np.float)
+                    # Storing the sequences
+                    #obj = {"data": seq, "label": labelid}
+                    print("input values are")
+                    print(seq.shape)
+                    print(act_val[f])
+                    print(labelid_val[f])
+                    obj = {"data": seq, "act_label": act_val[f], "act_labels_all": act_all_val[f], "label": labelid_val[f]}
+                
+                    f = open(os.path.join(data_dir_val, 'seq_{0:06}.pkl'.format(counter_seq)), 'wb')
+                    pickle.dump(obj, f, protocol=pickle.HIGHEST_PROTOCOL)
+                    f.close()
+
+                    counter_seq += 1
+                except: 
+                     raise('\nError adding the seq')
+        elif usage_modus=='test':         
+            print("test data save")
+            print("target file name")
+            print(data_dir_test)
+            counter_seq = 0
+            for f in range(data_test.shape[0]):
+                try:
+                    sys.stdout.write('\r' + 'Creating sequence file '
+                                     'number {} with id {}'.format(f, counter_seq))
+                    sys.stdout.flush()
+
+                    # print "Creating sequence file number {} with id {}".format(f, counter_seq)
+                    seq = np.reshape(data_test[f], newshape = (1, data_test.shape[1], data_test.shape[2]))
+                    seq = np.require(seq, dtype=np.float)
+                    # Storing the sequences
+                    #obj = {"data": seq, "label": labelid}
+                    print("input values are")
+                    print(seq.shape)
+                    print(act_test[f])
+                    print(labelid_test[f])
+                    obj = {"data": seq, "act_label": act_test[f], "act_labels_all": act_all_test[f], "label": labelid_test[f]}
+                
+                    f = open(os.path.join(data_dir_test, 'seq_{0:06}.pkl'.format(counter_seq)), 'wb')
+                    pickle.dump(obj, f, protocol=pickle.HIGHEST_PROTOCOL)
+                    f.close()
+
+                    counter_seq += 1
+                except:
+                    raise('\nError adding the seq')
+    except:
+        print("error in saving") 
     
     '''
                try:
@@ -422,17 +523,15 @@ def create_dataset(identity_bool = False):
             '51', '52', '53', '54', '55', '56', '58', '59', '60',
             '61', '62', '63', '64', '65', '66', '67']
     
-    base_directory = '/data/nnair/idimuall/'
-    data_dir_train = base_directory + 'sequences_train/'
-    data_dir_val = base_directory + 'sequences_val/'
-    data_dir_test = base_directory + 'sequences_test/'
+    base_directory = '/data/nnair/mobiact/'
+    
     
     print("Reading subject info...")
     start_time = time.time()
     subject_info = read_subject_info(SUBJECT_INFO_FILE)
     print(f"Subject info read in {time.time() - start_time:.2f} seconds.")
     #print(subject_info)
-    generate_data(train_ids, sliding_window_length=200, sliding_window_step=50, data_dir=data_dir_train, usage_modus='train')
+    generate_data(train_ids, sliding_window_length=200, sliding_window_step=50, base_directory=base_directory, usage_modus='trainval')
     
     
     return
