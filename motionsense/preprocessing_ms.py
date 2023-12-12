@@ -209,8 +209,8 @@ def creat_time_series(dt_list, act_labels, trial_codes, base_directory, mode="ma
                         #vals = np.concatenate((vals, lbls), axis=1)
                         
                         if frames != 0:
-                            train_no=round(0.64*frames)
-                            val_no=round(0.18*frames)
+                            train_no=round(0.70*frames)
+                            val_no=round(0.15*frames)
                             tv= train_no+val_no
                     
                             '''

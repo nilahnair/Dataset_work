@@ -209,6 +209,20 @@ def generate_data(ids, sliding_window_length, sliding_window_step, data_dir=None
      #      activities = ['STD', 'WAL', 'JOG', 'JUM', 'STU', 'STN', 'SCH', 'CSI', 'CSO']
     
     all_segments = np.empty((0, 9))
+    if usage_modus=='trainval':
+        X_train = np.empty((0, 9))
+        act_train = np.empty((0))
+        id_train = np.empty((0))
+    
+        X_val = np.empty((0, 9))
+        act_val = np.empty((0))
+        id_val = np.empty((0))
+    
+    elif usage_modus=='test':
+        X_test = np.empty((0, 9))
+        act_test = np.empty((0))
+        id_test = np.empty((0))
+        
     for act in activities:
         print(act)
         for sub in ids:
@@ -224,17 +238,43 @@ def generate_data(ids, sliding_window_length, sliding_window_step, data_dir=None
                     data = reader_data(FOLDER_PATH + file_name_data)
                     print("\nFiles loaded in modus {}\n{}".format(usage_modus, file_name_data))
                     
-                    print(len(data['IMU']))
                     IMU=np.array(data['IMU'])
-                    print(IMU.shape)
                     all_segments = np.vstack((all_segments, IMU))
-                    print('new size of all_segments')
-                    print(all_segments.shape)
-                  
+                    
                     print("\nFiles loaded")
+                    
                 except:
                     print("\n1 In loading data,  in file {}".format(FOLDER_PATH + file_name_data))
                     continue
+            
+            frames = all_segments.shape[0]
+            if frames != 0:
+                train_no=round(0.70*frames)
+                val_no=round(0.15*frames)
+                tv= train_no+val_no
+                
+            print('confirming size of the train and val labels')
+            check= np.full((train_no), act)
+            check2=np.full((val_no), act)
+            print(check.shape)
+            print(check2.shape)
+            print(frames-tv)
+            
+            if usage_modus=='trainval':
+                X_train = np.vstack((X_train, all_segments[0:train_no,:]))
+                act_train = np.append(act_train, np.full((train_no), act))
+                id_train = np.append(id_train, np.full((train_no), sub))
+                print('done train')
+                            
+                X_val = np.vstack((X_val, all_segments[train_no:tv,:]))
+                act_val = np.append(act_val, np.full((val_no), act))
+                id_val = np.append(id_val, np.full((val_no), sub))
+                print('done val')
+            elif usage_modus=='test':
+                X_test = np.vstack((X_test, all_segments[tv:frames,:]))
+                act_test = np.append(act_test, np.full((val_no), act))
+                id_test = np.append(id_test, np.full((val_no), sub))
+                print('done test')
     
     '''
                try:
@@ -411,7 +451,7 @@ def create_dataset(identity_bool = False):
 '''
     
 
-def norm_mbientlab(data):
+def norm_mobi(data):
     """
     Normalizes all sensor channels
     Zero mean and unit variance
@@ -422,8 +462,8 @@ def norm_mbientlab(data):
 
     max_values= [ 19.53466397, 19.59746992, 19.27203208, 10.006583, 10.008111, 9.938472, 360.0, 179.99995, 89.948]
     min_values= [ -19.5243695, -19.60940892, -18.97174136, -10.007805, -10.008416, -9.990396, -89.79765, -179.9995, -89.852516]
-    mean_values=[ 0.265079537, 7.13106528, 0.387973281, -0.0225606363, -0.00302826137,  0.0131514254,  178.629895, -67.8435738, 2.02923485]
-    std_values=[ 3.49444826, 6.70119943, 3.31003981, 1.1238746, 1.12533643, 0.72129725, 105.81241608, 58.62837783, 17.58456297]
+    mean_values=np.array([ 0.265079537, 7.13106528, 0.387973281, -0.0225606363, -0.00302826137,  0.0131514254,  178.629895, -67.8435738, 2.02923485])
+    std_values=np.array([ 3.49444826, 6.70119943, 3.31003981, 1.1238746, 1.12533643, 0.72129725, 105.81241608, 58.62837783, 17.58456297])
     
     mean_values = np.reshape(mean_values, [1, 9])
     
