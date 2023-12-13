@@ -253,11 +253,8 @@ def generate_data(ids, sliding_window_length, sliding_window_step, base_director
                     print("\nFiles loaded in modus {}\n{}".format(usage_modus, file_name_data))
                     
                     IMU=np.array(data['IMU'])
-                    print('IMU shape')
-                    print(IMU.shape)
                     all_segments = np.vstack((all_segments, IMU))
-                    print('all_segment shape')
-                    print(all_segments.shape)
+                    
                     print("\nFiles loaded")
                     
                 except:
@@ -320,10 +317,6 @@ def generate_data(ids, sliding_window_length, sliding_window_step, base_director
                     seq = np.require(seq, dtype=np.float)
                     # Storing the sequences
                     #obj = {"data": seq, "label": labelid}
-                    print("input values are")
-                    print(seq.shape)
-                    print(act_train[f])
-                    print(labelid_train[f])
                     obj = {"data": seq, "act_label": act_train[f], "act_labels_all": act_all_train[f], "label": labelid_train[f]}
                     
                     f = open(os.path.join(data_dir_train, 'seq_{0:06}.pkl'.format(counter_seq)), 'wb')
@@ -349,10 +342,6 @@ def generate_data(ids, sliding_window_length, sliding_window_step, base_director
                     seq = np.require(seq, dtype=np.float)
                     # Storing the sequences
                     #obj = {"data": seq, "label": labelid}
-                    print("input values are")
-                    print(seq.shape)
-                    print(act_val[f])
-                    print(labelid_val[f])
                     obj = {"data": seq, "act_label": act_val[f], "act_labels_all": act_all_val[f], "label": labelid_val[f]}
                 
                     f = open(os.path.join(data_dir_val, 'seq_{0:06}.pkl'.format(counter_seq)), 'wb')
@@ -378,10 +367,6 @@ def generate_data(ids, sliding_window_length, sliding_window_step, base_director
                     seq = np.require(seq, dtype=np.float)
                     # Storing the sequences
                     #obj = {"data": seq, "label": labelid}
-                    print("input values are")
-                    print(seq.shape)
-                    print(act_test[f])
-                    print(labelid_test[f])
                     obj = {"data": seq, "act_label": act_test[f], "act_labels_all": act_all_test[f], "label": labelid_test[f]}
                 
                     f = open(os.path.join(data_dir_test, 'seq_{0:06}.pkl'.format(counter_seq)), 'wb')
@@ -552,21 +537,17 @@ def create_dataset(identity_bool = False):
     #print(subject_info)
     generate_data(train_ids, sliding_window_length=200, sliding_window_step=50, base_directory=base_directory, usage_modus='trainval')
     generate_data(test_ids, sliding_window_length=200, sliding_window_step=50, base_directory=base_directory, usage_modus='test')
-    
-    return
-
-
-    
-'''   
-    generate_data(train_ids, sliding_window_length=100, sliding_window_step=12, data_dir=data_dir_train, usage_modus='train')
-    generate_data(val_ids, sliding_window_length=100, sliding_window_step=12, data_dir=data_dir_val, usage_modus='val')
-    generate_data(test_ids, sliding_window_length=100, sliding_window_step=12, data_dir=data_dir_test, usage_modus='test')
+      
+    data_dir_train = base_directory + 'sequences_train/'
+    data_dir_val = base_directory + 'sequences_val/'
+    data_dir_test = base_directory + 'sequences_test/'
     
     generate_CSV(base_directory, "train.csv", data_dir_train)
     generate_CSV(base_directory, "val.csv", data_dir_val)
     generate_CSV(base_directory, "test.csv", data_dir_test)
     generate_CSV_final(base_directory + "train_final.csv", data_dir_train, data_dir_val)
-'''
+
+    return
     
 
 def norm_mobi(data):
