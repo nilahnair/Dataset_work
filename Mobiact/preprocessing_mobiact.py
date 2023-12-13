@@ -130,12 +130,14 @@ def opp_sliding_window(data_x, data_y, data_z, label_pos_end=True):
     print("Sliding window: Creating windows {} with step {}".format(ws, ss))
 
     data_x = sliding_window(data_x, (ws, data_x.shape[1]), (ss, 1))
+    print('IMU data split')
     # Label from the end
     if label_pos_end:
         data_y = np.asarray([[i[-1]] for i in sliding_window(data_y, ws, ss)])
         data_z = np.asarray([[i[-1]] for i in sliding_window(data_z, ws, ss)])
     else:
         if False:
+            print('false')
             # Label from the middle
             # not used in experiments
             data_y_labels = np.asarray(
@@ -145,6 +147,7 @@ def opp_sliding_window(data_x, data_y, data_z, label_pos_end=True):
         else:
             # Label according to mode
             try:
+                print('true')
                 data_y_labels = []
                 data_z_labels = []
                 for sw in sliding_window(data_y, ws, ss):
