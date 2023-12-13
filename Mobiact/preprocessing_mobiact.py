@@ -258,7 +258,11 @@ def generate_data(ids, sliding_window_length, sliding_window_step, base_director
                     print("\nFiles loaded in modus {}\n{}".format(usage_modus, file_name_data))
                     
                     IMU=np.array(data['IMU'])
+                    print('IMU shape')
+                    print(IMU.shape)
                     all_segments = np.vstack((all_segments, IMU))
+                    print('all_segment shape')
+                    print(all_segments.shape)
                     print("\nFiles loaded")
                     
                 except:
@@ -291,7 +295,10 @@ def generate_data(ids, sliding_window_length, sliding_window_step, base_director
                     print('done test')
             else:
                 continue
-    
+    print('shape of X act and id')
+    print(X_train.shape)
+    print(act_train.shape)
+    print(id_train.shape)
     try: 
         if usage_modus=='trainval':
             data_train, act_train, act_all_train, labelid_train, labelid_all_train = opp_sliding_window(X_train, act_train, id_train, label_pos_end = False)
