@@ -339,13 +339,8 @@ def generate_data(ids, activities, sliding_window_length, sliding_window_step, d
                     
                     # print "Creating sequence file number {} with id {}".format(f, counter_seq)
                     seq = np.reshape(data_train[f], newshape = (1, data_train.shape[1], data_train.shape[2]))
-                    print('Seq shape')
-                    print(seq.shape)
-                    print(seq)
                     seq = np.require(seq, dtype=float)
-                    print('Seq shape')
-                    print(seq.shape)
-                    print(seq)
+            
                     # Storing the sequences
                     #obj = {"data": seq, "label": labelid}
                     obj = {"data": seq, "act_label": act_train[f], "act_labels_all": act_all_train[f], "label": labelid_train[f]}
@@ -370,7 +365,7 @@ def generate_data(ids, activities, sliding_window_length, sliding_window_step, d
 
                     # print "Creating sequence file number {} with id {}".format(f, counter_seq)
                     seq = np.reshape(data_val[f], newshape = (1, data_val.shape[1], data_val.shape[2]))
-                    seq = np.require(seq, dtype=np.float)
+                    seq = np.require(seq, dtype=float)
                     # Storing the sequences
                     #obj = {"data": seq, "label": labelid}
                     obj = {"data": seq, "act_label": act_val[f], "act_labels_all": act_all_val[f], "label": labelid_val[f]}
@@ -395,7 +390,7 @@ def generate_data(ids, activities, sliding_window_length, sliding_window_step, d
 
                     # print "Creating sequence file number {} with id {}".format(f, counter_seq)
                     seq = np.reshape(data_test[f], newshape = (1, data_test.shape[1], data_test.shape[2]))
-                    seq = np.require(seq, dtype=np.float)
+                    seq = np.require(seq, dtype=float)
                     # Storing the sequences
                     #obj = {"data": seq, "label": labelid}
                     obj = {"data": seq, "act_label": act_test[f], "act_labels_all": act_all_test[f], "label": labelid_test[f]}
