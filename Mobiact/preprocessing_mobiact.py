@@ -290,8 +290,8 @@ def generate_data(ids, sliding_window_length, sliding_window_step, base_director
         
         print("window extraction begining")
         
-        print("training data save")
-        if usage_modus=='train':
+        print("data save")
+        if usage_modus=='trainval':
             print("target file name")
             print(data_dir_train)
             counter_seq = 0
