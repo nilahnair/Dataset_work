@@ -342,7 +342,7 @@ def generate_data(ids, activities, sliding_window_length, sliding_window_step, d
                     print('Seq shape')
                     print(seq.shape)
                     print(seq)
-                    seq = np.require(seq, dtype=np.float)
+                    seq = np.require(seq, dtype=float)
                     print('Seq shape')
                     print(seq.shape)
                     print(seq)
