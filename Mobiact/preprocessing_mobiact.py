@@ -137,7 +137,6 @@ def opp_sliding_window(data_x, data_y, data_z, label_pos_end=True):
         data_z = np.asarray([[i[-1]] for i in sliding_window(data_z, ws, ss)])
     else:
         if False:
-            print('false')
             # Label from the middle
             # not used in experiments
             data_y_labels = np.asarray(
@@ -147,13 +146,14 @@ def opp_sliding_window(data_x, data_y, data_z, label_pos_end=True):
         else:
             # Label according to mode
             try:
-                print('true')
                 data_y_labels = []
                 data_z_labels = []
                 for sw in sliding_window(data_y, ws, ss):
         
                     count_l = np.bincount(sw.astype(int), minlength=NUM_ACT_CLASSES)
+                    print(count_l)
                     idy = np.argmax(count_l)
+                    print(idy)
                     data_y_labels.append(idy)
                 data_y_labels = np.asarray(data_y_labels)
                 for sz in sliding_window(data_z, ws, ss):
@@ -530,13 +530,16 @@ def create_dataset(identity_bool = False):
     @param half: set for creating dataset with half the frequence.
     '''
     
-    train_ids=['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', 
+    train_ids=['1', '2', '3'] 
+    '''
+               '4', '5', '6', '7', '8', '9', '10', 
             '11', '12', '16', '18', '19', '20', 
             '21', '22', '23', '24', '25', '26', '27', '29',
             '32', '33', '35', '36', '37', '38', '39', '40', 
             '41', '42', '43', '44', '45', '46', '47', '48', '49', '50', 
             '51', '52', '53', '54', '55', '56', '58', '59', '60',
             '61', '62', '63', '64', '65', '66', '67']
+    '''
     test_ids=train_ids
     
     base_directory = '/data/nnair/mobiact/'
@@ -548,7 +551,7 @@ def create_dataset(identity_bool = False):
     print(f"Subject info read in {time.time() - start_time:.2f} seconds.")
     #print(subject_info)
     generate_data(train_ids, sliding_window_length=200, sliding_window_step=50, base_directory=base_directory, usage_modus='trainval')
-    generate_data(test_ids, sliding_window_length=200, sliding_window_step=50, base_directory=base_directory, usage_modus='test')
+    #generate_data(test_ids, sliding_window_length=200, sliding_window_step=50, base_directory=base_directory, usage_modus='test')
     
     return
 
