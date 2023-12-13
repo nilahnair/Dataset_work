@@ -24,6 +24,8 @@ Subject_id= {'SA01':0, 'SA02':1, 'SA03':2, 'SA04':3, 'SA05':4, 'SA06':5, 'SA07':
                'SE03':25, 'SE04':26, 'SE05':27, 'SE06':28, 'SE07':29, 'SE08':30, 'SE09':31, 'SE10':32, 'SE11':33, 'SE12':34, 'SE13':35, 'SE14':36, 'SE15':37}
 activities_id= {'D01':0, 'D02':1, 'D03':2, 'D04':3, 'D05':4, 'D07':5, 'D08':6, 'D09':7, 
                  'D10':8, 'D011':9, 'D12':10, 'D14':11, 'D15':12, 'D16':13, 'D17':14}
+NUM_ACT_CLASSES= 15
+NUM_CLASSES = 37
 ws = 200 #WINDOW_SIZE
 ss = 50 #STRIDE 
 SOFT_BIOMETRICS = ['age', 'height', 'weight', 'gender']
@@ -470,46 +472,12 @@ def main():
     generate_data(train_ids, activities, sliding_window_length=200, sliding_window_step=50, data_dir=data_dir_train, usage_modus='trainval')
     generate_data(train_ids, activities, sliding_window_length=200, sliding_window_step=50, data_dir=data_dir_test, usage_modus='test')
 
-    generate_CSV(base_directory, "train.csv", data_dir_train)
-    generate_CSV(base_directory, "val.csv", data_dir_val)
-    generate_CSV(base_directory, "test.csv", data_dir_test)
+    generate_CSV(base_directory, data_dir_train)
+    generate_CSV(base_directory, data_dir_val)
+    generate_CSV(base_directory, data_dir_test)
     generate_CSV_final(base_directory + "train_final.csv", data_dir_train, data_dir_val)
 
-    '''
-    all_segments = []
-    for subject_id in SUBJECT_IDS:
-        subject_segments = process_subject(subject_id)
-        
-        if subject_segments:
-            
-            all_segments.extend(subject_segments)
-
-    try:
-        all_data = pd.concat(all_segments, axis=0, ignore_index=True)
-        float_cols = all_data.select_dtypes(include=['float64']).columns
-        all_data[float_cols] = all_data[float_cols].astype('float32')
-        cat_cols = all_data.select_dtypes(include=['category']).columns
-        all_data[cat_cols] = all_data[cat_cols].astype('category')
-        print(all_data.head())
-        all_data['MMA8451Q_z'] = all_data['MMA8451Q_z'].str.replace(';', '').astype(float)
-       
-        feature_df = all_data.groupby('person_id').apply(lambda segment: extract_features(segment))
-        feature_df.reset_index(inplace=True)
-       
-        all_data = pd.merge(all_data, feature_df, on='person_id', how='left')
-        all_data = remove_original_sensor_data(all_data) 
-        all_data = rearrange_columns(all_data)
-        
-        normalize_and_encode(all_data)
-        #print(all_data.head())
-        X = all_data.iloc[:, :-5]
-        y = all_data[['person_id', 'age', 'height', 'weight', 'gender']]
-      
-        split_and_save_data(X, y)
-
-    except ValueError as e:
-        print(f"Error: {e}")  
-    '''
+    return
 
 if __name__ == "__main__":
     main()
