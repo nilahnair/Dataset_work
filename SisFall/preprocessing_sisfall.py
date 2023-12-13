@@ -277,12 +277,8 @@ def generate_data(ids, activities, sliding_window_length, sliding_window_step, d
                    print(file_name)
                    file_path = os.path.join(subject_dir, file_name)
                    segments = process_file(file_path)
-                   print(len(segments))
                    segments=np.array([np.array(i) for i in segments])
-                   print(segments.shape)
                    all_segments=np.concatenate((all_segments, segments), axis=0)
-                   #print('len of all segments')
-                   print(all_segments.shape)
                    
                except: 
                    print('no file path with name', file_name)
