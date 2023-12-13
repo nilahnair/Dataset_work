@@ -148,7 +148,7 @@ def opp_sliding_window(data_x, data_y, data_z, label_pos_end=True):
             try:
                 data_y_labels = []
                 data_z_labels = []
-                
+                print(data_y)
                 for sw in sliding_window(data_y, ws, ss):
                     print(sw)
                     print(NUM_ACT_CLASSES)
