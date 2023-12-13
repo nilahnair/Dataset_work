@@ -469,9 +469,9 @@ def main():
     generate_data(train_ids, activities, sliding_window_length=200, sliding_window_step=50, data_dir=base_directory, usage_modus='trainval')
     generate_data(train_ids, activities, sliding_window_length=200, sliding_window_step=50, data_dir=base_directory, usage_modus='test')
 
-    generate_CSV(base_directory, data_dir_train)
-    generate_CSV(base_directory, data_dir_val)
-    generate_CSV(base_directory, data_dir_test)
+    generate_CSV(base_directory + "train.csv", data_dir_train)
+    generate_CSV(base_directory+ "val.csv", data_dir_val)
+    generate_CSV(base_directory + "test.csv", data_dir_test)
     generate_CSV_final(base_directory + "train_final.csv", data_dir_train, data_dir_val)
     
     return
