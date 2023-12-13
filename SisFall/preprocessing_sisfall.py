@@ -452,14 +452,12 @@ def generate_CSV_final(csv_dir, data_dir1, data_dir2):
 
 def main():
     person_info = get_person_info()
-    train_ids= ['SA01','SA02', 'SA03']
-    '''
-    'SA04', 'SA05', 'SA06', 'SA07', 
+    train_ids= ['SA01','SA02', 'SA03', 'SA04', 'SA05', 'SA06', 'SA07', 
                 'SA08', 'SA09', 'SA10', 'SA11', 'SA12', 'SA13', 'SA14', 
                 'SA15', 'SA16', 'SA17', 'SA18', 'SA19', 'SA20', 'SA21', 
                 'SA22', 'SA23', 'SE01', 'SE02', 'SE03', 'SE04', 'SE05', 
                 'SE06', 'SE07', 'SE08', 'SE09', 'SE10', 'SE11', 'SE12', 'SE13', 'SE14', 'SE15']
-    '''
+   
     activities= ['D01', 'D02', 'D03', 'D04', 'D05', 'D07', 'D08', 'D09', 
                  'D10', 'D011', 'D12', 'D14', 'D15', 'D16', 'D17']
     
@@ -469,14 +467,13 @@ def main():
     data_dir_test = base_directory + 'sequences_test/'
     
     generate_data(train_ids, activities, sliding_window_length=200, sliding_window_step=50, data_dir=base_directory, usage_modus='trainval')
-    '''
     generate_data(train_ids, activities, sliding_window_length=200, sliding_window_step=50, data_dir=data_dir_test, usage_modus='test')
 
     generate_CSV(base_directory, data_dir_train)
     generate_CSV(base_directory, data_dir_val)
     generate_CSV(base_directory, data_dir_test)
     generate_CSV_final(base_directory + "train_final.csv", data_dir_train, data_dir_val)
-    '''
+    
     return
 
 if __name__ == "__main__":
