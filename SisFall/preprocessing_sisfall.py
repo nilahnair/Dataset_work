@@ -473,7 +473,7 @@ def main():
     data_dir_val = base_directory + 'sequences_val/'
     data_dir_test = base_directory + 'sequences_test/'
     
-    generate_data(train_ids, activities, sliding_window_length=200, sliding_window_step=50, data_dir=data_dir_train, usage_modus='trainval')
+    generate_data(train_ids, activities, sliding_window_length=200, sliding_window_step=50, data_dir=base_directory, usage_modus='trainval')
     '''
     generate_data(train_ids, activities, sliding_window_length=200, sliding_window_step=50, data_dir=data_dir_test, usage_modus='test')
 
