@@ -117,10 +117,7 @@ def opp_sliding_window(data_x, data_y, data_z, label_pos_end=True):
             try:
                 data_y_labels = []
                 data_z_labels = []
-                print('check1')
                 for sw in sliding_window(data_y, ws, ss):
-                    print('check2')
-                    print(sw)
                     count_l = np.bincount(sw.astype(int), minlength=NUM_ACT_CLASSES)
                     idy = np.argmax(count_l)
                     data_y_labels.append(idy)
@@ -342,7 +339,13 @@ def generate_data(ids, activities, sliding_window_length, sliding_window_step, d
                     
                     # print "Creating sequence file number {} with id {}".format(f, counter_seq)
                     seq = np.reshape(data_train[f], newshape = (1, data_train.shape[1], data_train.shape[2]))
+                    print('Seq shape')
+                    print(seq.shape)
+                    print(seq)
                     seq = np.require(seq, dtype=np.float)
+                    print('Seq shape')
+                    print(seq.shape)
+                    print(seq)
                     # Storing the sequences
                     #obj = {"data": seq, "label": labelid}
                     obj = {"data": seq, "act_label": act_train[f], "act_labels_all": act_all_train[f], "label": labelid_train[f]}
