@@ -237,8 +237,8 @@ def generate_data(ids, activities, sliding_window_length, sliding_window_step, d
                continue
            frames=all_segments.shape[0]
            if frames != 0:
-               train_no=round(0.64*frames)
-               val_no=round(0.18*frames)
+               train_no=round(0.70*frames)
+               val_no=round(0.15*frames)
                tv= train_no+val_no
                
            if usage_modus=='trainval':
