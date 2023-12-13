@@ -211,7 +211,7 @@ def generate_data(ids, sliding_window_length, sliding_window_step, base_director
     elif usage_modus == 'test':
           activities = ['STD', 'WAL', 'JOG', 'JUM', 'STU', 'STN', 'SCH', 'CSI', 'CSO']
     
-    all_segments = np.empty((0, 9))
+    
     if usage_modus=='trainval':
         X_train = np.empty((0, 9))
         act_train = np.empty((0))
@@ -230,6 +230,7 @@ def generate_data(ids, sliding_window_length, sliding_window_step, base_director
         print(act)
         for sub in ids:
             print(sub)
+            all_segments = np.empty((0, 9))
             for recordings in range(1,act_record[act]+1):
                 print(recordings)
             
@@ -243,13 +244,13 @@ def generate_data(ids, sliding_window_length, sliding_window_step, base_director
                     
                     IMU=np.array(data['IMU'])
                     all_segments = np.vstack((all_segments, IMU))
-                    all_segments = norm_mobi(all_segments)
-                    print("\nFiles loaded and normalised")
+                    print("\nFiles loaded")
                     
                 except:
                     print("\n1 In loading data,  in file {}".format(FOLDER_PATH + file_name_data))
                     continue
-            
+            all_segments = norm_mobi(all_segments)
+            print("\nFiles loaded and normalised")
             frames = all_segments.shape[0]
             if frames != 0:
                 train_no=round(0.70*frames)
