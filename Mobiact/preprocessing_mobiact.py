@@ -146,16 +146,19 @@ def opp_sliding_window(data_x, data_y, data_z, label_pos_end=True):
         else:
             # Label according to mode
             try:
+                print('check1')
                 data_y_labels = []
                 data_z_labels = []
+    
                 for sw in sliding_window(data_y, ws, ss):
-        
+                    print('check2')
                     count_l = np.bincount(sw.astype(int), minlength=NUM_ACT_CLASSES)
                     print(count_l)
                     idy = np.argmax(count_l)
                     print(idy)
                     data_y_labels.append(idy)
                 data_y_labels = np.asarray(data_y_labels)
+                print('check3')
                 for sz in sliding_window(data_z, ws, ss):
                     count_l = np.bincount(sz.astype(int), minlength=NUM_CLASSES)
                     idy = np.argmax(count_l)
