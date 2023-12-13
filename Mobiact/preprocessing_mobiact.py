@@ -21,9 +21,11 @@ import pandas as pd
 FOLDER_PATH = "/vol/actrec/MobiAct_Dataset/"
 SUBJECT_INFO_FILE = '/vol/actrec/MobiAct_Dataset/Readme.txt'
 
+NUM_ACT_CLASSES=9
+NUM_CLASSES=58
 
-WINDOW_SIZE = 200
-STRIDE = 50
+ws = 200
+ss = 50
 
 activities_id={'STD':0, 'WAL':1, 'JOG':2, 'JUM':3, 'STU':4, 'STN':5, 'SCH':6, 'CSI':7, 'CSO':8}
 subject_id={'1':0, '2':1, '3':2, '4':3, '5':4, '6':5, '7':6, '8':7, '9':8, '10':9, 
@@ -109,7 +111,7 @@ def reader_data(path):
 
 
 
-def opp_sliding_window(data_x, data_y, ws, ss, label_pos_end=True):
+def opp_sliding_window(data_x, data_y, data_z, label_pos_end=True):
     '''
     Performs the sliding window approach on the data and the labels
 
@@ -124,46 +126,53 @@ def opp_sliding_window(data_x, data_y, ws, ss, label_pos_end=True):
     @param ss: ids for train
     @param label_pos_end: ids for train
     '''
-'''
+
     print("Sliding window: Creating windows {} with step {}".format(ws, ss))
 
     data_x = sliding_window(data_x, (ws, data_x.shape[1]), (ss, 1))
-
-    count_l = 0
-    idy = 0
     # Label from the end
     if label_pos_end:
-        data_y = np.asarray([[i[-1]] for i in sliding_window(data_y, (ws, data_y.shape[1]), (ss, 1))])
+        data_y = np.asarray([[i[-1]] for i in sliding_window(data_y, ws, ss)])
+        data_z = np.asarray([[i[-1]] for i in sliding_window(data_z, ws, ss)])
     else:
         if False:
             # Label from the middle
             # not used in experiments
             data_y_labels = np.asarray(
-                [[i[i.shape[0] // 2]] for i in sliding_window(data_y, (ws, data_y.shape[1]), (ss, 1))])
+                [[i[i.shape[0] // 2]] for i in sliding_window(data_y, ws, ss)])
+            data_z_labels = np.asarray(
+                [[i[i.shape[0] // 2]] for i in sliding_window(data_z, ws, ss)])
         else:
             # Label according to mode
             try:
                 data_y_labels = []
-                for sw in sliding_window(data_y, (ws, data_y.shape[1]), (ss, 1)):
-                    labels = np.zeros((1)).astype(int)
-                    count_l = np.bincount(sw[:, 0], minlength=NUM_CLASSES)
+                data_z_labels = []
+                for sw in sliding_window(data_y, ws, ss):
+        
+                    count_l = np.bincount(sw.astype(int), minlength=NUM_ACT_CLASSES)
                     idy = np.argmax(count_l)
-                   
-                    labels[0] = idy
-                   
-                    data_y_labels.append(labels)
+                    data_y_labels.append(idy)
                 data_y_labels = np.asarray(data_y_labels)
+                for sz in sliding_window(data_z, ws, ss):
+                    count_l = np.bincount(sz.astype(int), minlength=NUM_CLASSES)
+                    idy = np.argmax(count_l)
+                    data_z_labels.append(idy)
+                data_z_labels = np.asarray(data_z_labels)
+
+
             except:
                 print("Sliding window: error with the counting {}".format(count_l))
                 print("Sliding window: error with the counting {}".format(idy))
                 return np.Inf
 
             # All labels per window
-            data_y_all = np.asarray([i[:] for i in sliding_window(data_y, (ws, data_y.shape[1]), (ss, 1))])
+            data_y_all = np.asarray([i[:] for i in sliding_window(data_y, ws, ss)])
+            data_z_all = np.asarray([i[:] for i in sliding_window(data_z, ws, ss)])
+            print('sliding window complete')
+    
+    return data_x.astype(np.float32), data_y_labels.astype(np.uint8), data_y_all.astype(np.uint8), data_z_labels.astype(np.uint8), data_z_all.astype(np.uint8)
+    
 
-    return data_x.astype(np.float32), data_y_labels.astype(np.uint8), data_y_all.astype(np.uint8)
-
-'''
 def divide_x_y(data):
     """
     Segments each sample into features and label
