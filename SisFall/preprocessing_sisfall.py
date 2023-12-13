@@ -4,9 +4,6 @@ import gc
 
 import numpy as np
 import pandas as pd
-from sklearn.preprocessing import StandardScaler, LabelEncoder
-from sklearn.model_selection import train_test_split
-from multiprocessing import Pool
 from sliding_window_sf import sliding_window
 
 import sys
@@ -80,6 +77,69 @@ def find_stats(ids, activities, data_dir=None):
     print(std_values)
     
     return
+
+def opp_sliding_window(data_x, data_y, data_z, label_pos_end=True):
+    '''
+    Performs the sliding window approach on the data and the labels
+
+    return three arrays.
+    - data, an array where first dim is the windows
+    - labels per window according to end, middle or mode
+    - all labels per window
+
+    @param data_x: ids for train
+    @param data_y: ids for train
+    @param ws: ids for train
+    @param ss: ids for train
+    @param label_pos_end: ids for train
+    '''
+
+    print("Sliding window: Creating windows {} with step {}".format(ws, ss))
+
+    data_x = sliding_window(data_x, (ws, data_x.shape[1]), (ss, 1))
+    print('IMU data split')
+    # Label from the end
+    if label_pos_end:
+        data_y = np.asarray([[i[-1]] for i in sliding_window(data_y, ws, ss)])
+        data_z = np.asarray([[i[-1]] for i in sliding_window(data_z, ws, ss)])
+    else:
+        if False:
+            # Label from the middle
+            # not used in experiments
+            data_y_labels = np.asarray(
+                [[i[i.shape[0] // 2]] for i in sliding_window(data_y, ws, ss)])
+            data_z_labels = np.asarray(
+                [[i[i.shape[0] // 2]] for i in sliding_window(data_z, ws, ss)])
+        else:
+            # Label according to mode
+            try:
+                data_y_labels = []
+                data_z_labels = []
+                
+                for sw in sliding_window(data_y, ws, ss):
+                    count_l = np.bincount(sw.astype(int), minlength=NUM_ACT_CLASSES)
+                    idy = np.argmax(count_l)
+                    data_y_labels.append(idy)
+                data_y_labels = np.asarray(data_y_labels)
+                for sz in sliding_window(data_z, ws, ss):
+                    count_l = np.bincount(sz.astype(int), minlength=NUM_CLASSES)
+                    idy = np.argmax(count_l)
+                    data_z_labels.append(idy)
+                data_z_labels = np.asarray(data_z_labels)
+
+
+            except:
+                print("Sliding window: error with the counting {}".format(count_l))
+                print("Sliding window: error with the counting {}".format(idy))
+                return np.Inf
+
+            # All labels per window
+            data_y_all = np.asarray([i[:] for i in sliding_window(data_y, ws, ss)])
+            data_z_all = np.asarray([i[:] for i in sliding_window(data_z, ws, ss)])
+            print('sliding window complete')
+    
+    return data_x.astype(np.float32), data_y_labels.astype(np.uint8), data_y_all.astype(np.uint8), data_z_labels.astype(np.uint8), data_z_all.astype(np.uint8)
+    
 
 def get_person_info():
     # Open the readme file and read the lines
@@ -186,44 +246,41 @@ def generate_data(ids, activities, sliding_window_length, sliding_window_step, d
     data_dir_test = data_dir + 'sequences_test/'
     
     if usage_modus=='trainval':
-        X_train = np.empty((0, 200, 9))
+        X_train = np.empty((0, 9))
         act_train = np.empty((0))
         id_train = np.empty((0))
     
-        X_val = np.empty((0, 200, 9))
+        X_val = np.empty((0, 9))
         act_val = np.empty((0))
         id_val = np.empty((0))
     
     elif usage_modus=='test':
-        X_test = np.empty((0, 200, 9))
+        X_test = np.empty((0, 9))
         act_test = np.empty((0))
         id_test = np.empty((0))
     
     #counter_seq = 0
     #hist_classes_all = np.zeros((NUM_CLASSES))
     recordings= ['R01', 'R02', 'R03', 'R04', 'R05', 'R06']
-    all_segments = np.empty((0, 9))
     for subject_id in ids:
        print('Processing subject', subject_id)
        subject_dir = os.path.join(DATA_DIR, subject_id)
        file_list = os.listdir(subject_dir)
        for act in activities:
            #print(act)
+           all_segments = np.empty((0, 9))
            for R in recordings:
-               segments=[]
                try:
                    file_name= "{}_{}_{}.txt".format(act, subject_id, R)
                    print(file_name)
                    file_path = os.path.join(subject_dir, file_name)
-                   #print(file_path)
                    segments = process_file(file_path)
-                   #print(len(segments))
+                   print(len(segments))
                    segments=np.array([np.array(i) for i in segments])
-                   #print(segments.shape)
-                   #print(segments)
+                   print(segments.shape)
                    all_segments=np.concatenate((all_segments, segments), axis=0)
                    #print('len of all segments')
-                   #print(all_segments.shape)
+                   print(all_segments.shape)
                    
                except: 
                    print('no file path with name', file_name)
@@ -241,109 +298,54 @@ def generate_data(ids, activities, sliding_window_length, sliding_window_step, d
                val_no=round(0.15*frames)
                tv= train_no+val_no
                
-           if usage_modus=='trainval':
-               train =data_x[0:train_no,:]
-               #act_train = np.append(act_train, [lbls[0:train_no,0]])
-               #id_train = np.append(id_train, [lbls[0:train_no,1]])
-               print('train split')
-                            
-               val = data_x[train_no:tv,:]
-               #act_val = np.append(act_val, [lbls[train_no:tv,0]])
-               #id_val = np.append(id_val, [lbls[train_no:tv,1]])
-               print('val split')
-           elif usage_modus=='test':
-                test = data_x[tv:frames,:]
-                #act_test = np.append(act_test, [lbls[tv:frames,0]])
-                #id_test = np.append(id_test, [lbls[tv:frames,1]])
-                print('test split')
-                    
-           print('frames')
-           print(frames)
-           if usage_modus=='trainval':
-               print('train')
-               print(train.shape)
-               print('val')
-               print(val.shape)
-           elif usage_modus=='test':
-               print('test')
-               print(test.shape)
-                    
-               
-           try: 
                if usage_modus=='trainval':
-                   print('Sliding window')
-                   train = sliding_window(train, (ws, train.shape[1]), (ss, 1))
-                   print(train.shape)
-                   train_act = np.full(train.shape[0], activities_id[act])
-                   print(activities_id[act])
-                   train_id = np.full(train.shape[0], Subject_id[subject_id])
-                   print(Subject_id[subject_id])
-                   print(train_act.shape)
-                   print('train_act')
-                   print(train_act[0])
-                   print(train_act.shape)
-                   val = sliding_window(val, (ws, val.shape[1]), (ss, 1))
-                   val_act = np.full(val.shape[0], activities_id[act])
-                   val_id = np.full(val.shape[0], Subject_id[subject_id])
-                   
-                   print(val.shape)
-               elif usage_modus=='test':
-                   print('Sliding window')
-                   test= sliding_window(test, (ws, test.shape[1]), (ss, 1))
-                   test_act = np.full(test.shape[0], activities_id[act])
-                   test_id = np.full(test.shape[0], Subject_id[subject_id])
-                   print(test.shape)
-           except:
-               print("error in sliding window")
-               
-           if usage_modus=='trainval':
-               X_train = np.vstack((X_train, train))
-               act_train = np.append(act_train, train_act)
-               id_train = np.append(id_train, train_id)
-               print('done train')
+                    X_train = np.vstack((X_train, all_segments[0:train_no,:]))
+                    act_train = np.append(act_train, np.full((train_no), activities_id[act]))
+                    id_train = np.append(id_train, np.full((train_no), Subject_id[subject_id]))
+                    print('done train')
                             
-               X_val = np.vstack((X_val, val))
-               act_val = np.append(act_val, val_act)
-               id_val = np.append(id_val, val_id)
-               print('done val')
-           elif usage_modus=='test':
-               X_test = np.vstack((X_test, test))
-               act_test = np.append(act_test, test_act)
-               id_test = np.append(id_test, test_id)
-               print('done test')
-               
-           if usage_modus=='trainval':
-               print('X_train')
-               print(X_train.shape)
-               print(act_train.shape)
-               print(id_train.shape)
-               print('X_val')
-               print(X_val.shape)
-           elif usage_modus=='test':
-               print('X_test')
-               print(X_test.shape) 
-    
+                    X_val = np.vstack((X_val, all_segments[train_no:tv,:]))
+                    act_val = np.append(act_val, np.full((val_no), activities_id[act]))
+                    id_val = np.append(id_val, np.full((val_no), Subject_id[subject_id]))
+                    print('done val')
+               elif usage_modus=='test':
+                    X_test = np.vstack((X_test, all_segments[tv:frames,:]))
+                    act_test = np.append(act_test, np.full((frames-tv), activities_id[act]))
+                    id_test = np.append(id_test, np.full((frames-tv), Subject_id[subject_id]))
+                    print('done test')
+           else:
+                continue
+                    
+    try: 
+        if usage_modus=='trainval':
+            data_train, act_train, act_all_train, labelid_train, labelid_all_train = opp_sliding_window(X_train, act_train, id_train, label_pos_end = False)
+            data_val, act_val, act_all_val, labelid_val, labelid_all_val = opp_sliding_window(X_val, act_val, id_val, label_pos_end = False)
+        elif usage_modus=='test':
+            data_test, act_test, act_all_test, labelid_test, labelid_all_test = opp_sliding_window(X_test, act_test, id_test, label_pos_end = False)
+    except:
+        print("error in sliding window")
+        
     try:
         
-        print("training data save")
-        if usage_modus=='train':
+        print("window extraction begining")
+        
+        print("data save")
+        if usage_modus=='trainval':
             print("target file name")
             print(data_dir_train)
             counter_seq = 0
-            for f in range(X_train.shape[0]):
+            for f in range(data_train.shape[0]):
                 try:
                     sys.stdout.write('\r' + 'Creating sequence file '
                                      'number {} with id {}'.format(f, counter_seq))
                     sys.stdout.flush()
                     
                     # print "Creating sequence file number {} with id {}".format(f, counter_seq)
-                    seq = np.reshape(X_train[f], newshape = (1, X_train.shape[1], X_train.shape[2]))
+                    seq = np.reshape(data_train[f], newshape = (1, data_train.shape[1], data_train.shape[2]))
                     seq = np.require(seq, dtype=np.float)
                     # Storing the sequences
                     #obj = {"data": seq, "label": labelid}
-                    print("input values are")
-                    print(seq.shape)
-                    obj = {"data": seq, "act_label": act_train[f], "label": id_train[f]}
+                    obj = {"data": seq, "act_label": act_train[f], "act_labels_all": act_all_train[f], "label": labelid_train[f]}
                     
                     f = open(os.path.join(data_dir_train, 'seq_{0:06}.pkl'.format(counter_seq)), 'wb')
                     pickle.dump(obj, f, protocol=pickle.HIGHEST_PROTOCOL)
@@ -357,22 +359,18 @@ def generate_data(ids, activities, sliding_window_length, sliding_window_step, d
             print("target file name")
             print(data_dir_val)
             counter_seq = 0
-            for f in range(X_val.shape[0]):
+            for f in range(data_val.shape[0]):
                 try:
                     sys.stdout.write('\r' + 'Creating sequence file '
                                      'number {} with id {}'.format(f, counter_seq))
                     sys.stdout.flush()
 
                     # print "Creating sequence file number {} with id {}".format(f, counter_seq)
-                    seq = np.reshape(X_val[f], newshape = (1, X_val.shape[1], X_val.shape[2]))
+                    seq = np.reshape(data_val[f], newshape = (1, data_val.shape[1], data_val.shape[2]))
                     seq = np.require(seq, dtype=np.float)
                     # Storing the sequences
                     #obj = {"data": seq, "label": labelid}
-                    print("input values are")
-                    print(seq.shape)
-                    print(act_val[f])
-                    print(id_val[f])
-                    obj = {"data": seq, "act_label": act_val[f], "label": id_val[f]}
+                    obj = {"data": seq, "act_label": act_val[f], "act_labels_all": act_all_val[f], "label": labelid_val[f]}
                 
                     f = open(os.path.join(data_dir_val, 'seq_{0:06}.pkl'.format(counter_seq)), 'wb')
                     pickle.dump(obj, f, protocol=pickle.HIGHEST_PROTOCOL)
@@ -386,22 +384,18 @@ def generate_data(ids, activities, sliding_window_length, sliding_window_step, d
             print("target file name")
             print(data_dir_test)
             counter_seq = 0
-            for f in range(X_test.shape[0]):
+            for f in range(data_test.shape[0]):
                 try:
                     sys.stdout.write('\r' + 'Creating sequence file '
                                      'number {} with id {}'.format(f, counter_seq))
                     sys.stdout.flush()
 
                     # print "Creating sequence file number {} with id {}".format(f, counter_seq)
-                    seq = np.reshape(X_test[f], newshape = (1, X_test.shape[1], X_test.shape[2]))
+                    seq = np.reshape(data_test[f], newshape = (1, data_test.shape[1], data_test.shape[2]))
                     seq = np.require(seq, dtype=np.float)
                     # Storing the sequences
                     #obj = {"data": seq, "label": labelid}
-                    print("input values are")
-                    print(seq.shape)
-                    print(act_test[f])
-                    print(id_test[f])
-                    obj = {"data": seq, "act_label": act_test[f], "label": id_test[f]}
+                    obj = {"data": seq, "act_label": act_test[f], "act_labels_all": act_all_test[f], "label": labelid_test[f]}
                 
                     f = open(os.path.join(data_dir_test, 'seq_{0:06}.pkl'.format(counter_seq)), 'wb')
                     pickle.dump(obj, f, protocol=pickle.HIGHEST_PROTOCOL)
@@ -411,7 +405,7 @@ def generate_data(ids, activities, sliding_window_length, sliding_window_step, d
                 except:
                     raise('\nError adding the seq')
     except:
-        print("error in saving")  
+        print("error in saving") 
         
     return
 

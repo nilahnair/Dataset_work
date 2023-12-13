@@ -378,92 +378,9 @@ def generate_data(ids, sliding_window_length, sliding_window_step, base_director
                     raise('\nError adding the seq')
     except:
         print("error in saving") 
-    
-    '''
-               try:
-                  # Getting labels and attributes
-                  labels = csv_reader.reader_labels(FOLDER_PATH + file_name_label)
-                  class_labels = np.where(labels[:, 0] == 7)[0]
-
-                  # Deleting rows containing the "none" class
-                  data_x = np.delete(data_x, class_labels, 0)
-                  labels = np.delete(labels, class_labels, 0)
-
-                  #data_t, data_x, data_y = divide_x_y(data)
-                  #del data_t
-               except:
-                  print("2 In generating data, Error getting the data {}".format(FOLDER_PATH
-                                                                                       + file_name_data))
-                  continue
-               
-               try:
-                  data_x = norm_mbientlab(data_x)
-               except:
-                  print("\n3  In generating data, Plotting {}".format(FOLDER_PATH + file_name_data))
-                  continue
-              
-               try:
-                  # checking if annotations are consistent
-                  if data_x.shape[0] == data_x.shape[0]:
-
-                      # Sliding window approach
-                      print("\nStarting sliding window")
-                      X, y, y_all = opp_sliding_window(data_x, labels.astype(int), sliding_window_length,
-                                                             sliding_window_step, label_pos_end=False)
-                      print("\nWindows are extracted")
-
-                            # Statistics
-
-                      hist_classes = np.bincount(y[:, 0], minlength=NUM_CLASSES)
-                      hist_classes_all += hist_classes
-                      print("\nNumber of seq per class {}".format(hist_classes_all))
-                      
-                      for f in range(X.shape[0]):
-                          try:
-
-                              sys.stdout.write(
-                                        '\r' +
-                                        'Creating sequence file number {} with id {}'.format(f, counter_seq))
-                              sys.stdout.flush()
-
-                              # print "Creating sequence file number {} with id {}".format(f, counter_seq)
-                              seq = np.reshape(X[f], newshape=(1, X.shape[1], X.shape[2]))
-                              seq = np.require(seq, dtype=np.float)
-                              
-                              
-                              obj = {"data": seq, "act_label": y[f], "act_labels_all": y_all[f], "label": labels_persons[P]}
-                                           
-                              file_name = open(os.path.join(data_dir,
-                                                                  'seq_{0:06}.pkl'.format(counter_seq)), 'wb')
-                              pickle.dump(obj, file_name, protocol=pickle.HIGHEST_PROTOCOL)
-                              file_name.close()
-
-                              counter_seq += 1
-
-                          except:
-                              raise ('\nError adding the seq')
-
-                      print("\nCorrect data extraction from {}".format(FOLDER_PATH + file_name_data))
-
-                      del data
-                      del data_x
-                      del X
-                      del labels
-                      del class_labels
-
-                  else:
-                      print("\n4 Not consisting annotation in  {}".format(file_name_data))
-                      continue
-               except:
-                   print("\n5 In generating data, No created file {}".format(FOLDER_PATH + file_name_data))
-                   print("-----------------\n{}\n{}\n-----------------".format(file_name_data, file_name_label))
-                   continue
-               
-           except KeyboardInterrupt:
-               print('\nYou cancelled the operation.')
-
+        
     return
-'''
+   
 
 def generate_CSV(csv_dir, type_file, data_dir):
     '''
