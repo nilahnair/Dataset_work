@@ -148,9 +148,9 @@ def opp_sliding_window(data_x, data_y, data_z, label_pos_end=True):
             try:
                 data_y_labels = []
                 data_z_labels = []
-    
+                
                 for sw in sliding_window(data_y, ws, ss):
-                    print(sw.astype(int))
+                    print(sw)
                     print(NUM_ACT_CLASSES)
                     count_l = np.bincount(sw.astype(int), minlength=NUM_ACT_CLASSES)
                     print(count_l)
