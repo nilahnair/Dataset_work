@@ -12,7 +12,7 @@ from sliding_window_ms import sliding_window
 import pickle
 import sys
 
-location = "C:/Users/nilah/OneDrive/Desktop/Work/FLW/Christopher/Datasetbias/Datasets/motion-sense-master/motion-sense-master/data/A_DeviceMotion_data/A_DeviceMotion_data/"
+location = "/vol/actrec/motion-sense-master/data/A_DeviceMotion_data/A_DeviceMotion_data/"
 NB_SENSOR_CHANNELS = 9
 NUM_ACT_CLASSES= 6
 NUM_CLASSES = 24
@@ -117,7 +117,7 @@ def opp_sliding_window(data_x, data_y, data_z, label_pos_end=True):
 
 def get_ds_infos():
     ## 0:Code, 1:Weight, 2:Height, 3:Age, 4:Gender
-    dss = np.genfromtxt("C:/Users/nilah/OneDrive/Desktop/Work/FLW/Christopher/Datasetbias/Datasets/motion-sense-master/motion-sense-master/data/data_subjects_info.csv", delimiter=',')
+    dss = np.genfromtxt("/vol/actrec/motion-sense-master/data/data_subjects_info.csv", delimiter=',')
     dss = dss[1:]
     print("----> Data subjects information is imported.")
 
@@ -148,10 +148,10 @@ def creat_time_series(dt_list, act_labels, trial_codes, base_directory, mode="ma
         
     ds_list = get_ds_infos()
     
-    #sel_sub=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]
+    sel_sub=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]
 
     if usage_modus=='trainval':
-        sel_sub=[1, 2, 3, 4]
+        #sel_sub=[1, 2, 3, 4]
         
         X_train = np.empty((0, NB_SENSOR_CHANNELS))
         act_train = np.empty((0))
@@ -162,7 +162,7 @@ def creat_time_series(dt_list, act_labels, trial_codes, base_directory, mode="ma
         id_val = np.empty((0))
     
     elif usage_modus=='test':
-        sel_sub=[5, 6, 7, 8]
+        #sel_sub=[5, 6, 7, 8]
         
         X_test = np.empty((0, NB_SENSOR_CHANNELS))
         act_test = np.empty((0))
@@ -418,7 +418,7 @@ if __name__ == '__main__':
     print("[INFO] -- Selected activites: "+str(act_labels))    
     trial_codes = [TRIAL_CODES[act] for act in act_labels]
     
-    base_directory = '/data/nnair/motionsense/attr/t0/'
+    base_directory = '/data/nnair/motionsense/id/prepros/'
     
     creat_time_series(dt_list, act_labels, trial_codes, base_directory, mode="raw", labeled=True, usage_modus='trainval')
     creat_time_series(dt_list, act_labels, trial_codes, base_directory, mode="raw", labeled=True, usage_modus='test')
