@@ -17,8 +17,8 @@ NB_SENSOR_CHANNELS = 9
 NUM_ACT_CLASSES= 6
 NUM_CLASSES = 24
 
-ws = 100
-ss = 12
+ws = 200
+ss = 25
 
 def norm_ms(data):
     """
