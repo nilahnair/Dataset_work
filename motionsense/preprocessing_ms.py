@@ -148,6 +148,10 @@ def creat_time_series(dt_list, act_labels, trial_codes, base_directory, mode="ma
         
     ds_list = get_ds_infos()
     
+    data_dir_train = base_directory + 'sequences_train/'
+    data_dir_val = base_directory + 'sequences_val/'
+    data_dir_test = base_directory + 'sequences_test/'
+    
     sel_sub=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]
 
     if usage_modus=='trainval':
@@ -161,7 +165,7 @@ def creat_time_series(dt_list, act_labels, trial_codes, base_directory, mode="ma
         act_val = np.empty((0))
         id_val = np.empty((0))
     
-    elif usage_modus=='test':
+    #elif usage_modus=='test':
         #sel_sub=[5, 6, 7, 8]
         
         X_test = np.empty((0, NB_SENSOR_CHANNELS))
@@ -225,11 +229,11 @@ def creat_time_series(dt_list, act_labels, trial_codes, base_directory, mode="ma
                            act_val = np.append(act_val, [lbls[train_no:tv,0]])
                            id_val = np.append(id_val, [lbls[train_no:tv,1]])
                            print('done val')
-                        elif usage_modus=='test':
-                            X_test = np.vstack((X_test, vals[tv:frames,:]))
-                            act_test = np.append(act_test, [lbls[tv:frames,0]])
-                            id_test = np.append(id_test, [lbls[tv:frames,1]])
-                            print('done test')
+                        #elif usage_modus=='test':
+                           X_test = np.vstack((X_test, vals[tv:frames,:]))
+                           act_test = np.append(act_test, [lbls[tv:frames,0]])
+                           id_test = np.append(id_test, [lbls[tv:frames,1]])
+                           print('done test')
                     
                     #dataset = np.append(dataset,vals, axis=0)
     print('sliding window')
@@ -237,7 +241,7 @@ def creat_time_series(dt_list, act_labels, trial_codes, base_directory, mode="ma
         if usage_modus=='trainval':
             data_train, act_train, act_all_train, labelid_train, labelid_all_train = opp_sliding_window(X_train, act_train, id_train, label_pos_end = False)
             data_val, act_val, act_all_val, labelid_val, labelid_all_val = opp_sliding_window(X_val, act_val, id_val, label_pos_end = False)
-        elif usage_modus=='test':
+        #elif usage_modus=='test':
             data_test, act_test, act_all_test, labelid_test, labelid_all_test = opp_sliding_window(X_test, act_test, id_test, label_pos_end = False)
     except:
         print("error in sliding window")
@@ -247,7 +251,7 @@ def creat_time_series(dt_list, act_labels, trial_codes, base_directory, mode="ma
         print("window extraction begining")
         
         print("training data save")
-        if usage_modus=='train':
+        if usage_modus=='trainval':
             print("target file name")
             print(data_dir_train)
             counter_seq = 0
@@ -296,7 +300,7 @@ def creat_time_series(dt_list, act_labels, trial_codes, base_directory, mode="ma
                     counter_seq += 1
                 except: 
                      raise('\nError adding the seq')
-        elif usage_modus=='test':         
+        #elif usage_modus=='test':         
             print("test data save")
             print("target file name")
             print(data_dir_test)
@@ -421,7 +425,7 @@ if __name__ == '__main__':
     base_directory = '/data/nnair/motionsense/id/prepros/'
     
     creat_time_series(dt_list, act_labels, trial_codes, base_directory, mode="raw", labeled=True, usage_modus='trainval')
-    creat_time_series(dt_list, act_labels, trial_codes, base_directory, mode="raw", labeled=True, usage_modus='test')
+    #creat_time_series(dt_list, act_labels, trial_codes, base_directory, mode="raw", labeled=True, usage_modus='test')
     
     data_dir_train = base_directory + 'sequences_train/'
     data_dir_val = base_directory + 'sequences_val/'
