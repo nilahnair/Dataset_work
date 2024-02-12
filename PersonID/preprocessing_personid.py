@@ -67,6 +67,8 @@ def read_folder(record_file_path):
     labels_out = np.empty((1,))
 
     for file in tqdm(glob.glob(f"{record_file_path}{os.sep}*")):
+        print('file name')
+        print(file)
         sensor_data = np.load(file, allow_pickle=True).item()
 
         identifier = sensor_data['id']
@@ -191,7 +193,7 @@ def generate_data(ids, sliding_window_length, sliding_window_step, data_dir=None
     hist_classes_all = np.zeros((NUM_CLASSES))
 
     for subject_id in ids:
-        subject_folder = f"{BASE_DIR}{os.sep}db_release{os.sep}db_10min{os.sep}db_{ID_2_SUBJECT[subject_id]}{os.sep}"
+        subject_folder = f"db_{ID_2_SUBJECT[subject_id]}{os.sep}" #f"{BASE_DIR}{os.sep}db_release{os.sep}db_10min{os.sep}db_{ID_2_SUBJECT[subject_id]}{os.sep}"
         print('subject folder')
         print(subject_folder)
         data_x, labels = read_folder(subject_folder)
@@ -199,7 +201,7 @@ def generate_data(ids, sliding_window_length, sliding_window_step, data_dir=None
         # labels is a [n,] vector indicating the classes
 
         #data_x = norm_mbientlab(data_x)
-
+        '''
         try:
             # checking if annotations are consistent
             if data_x.shape[0] == data_x.shape[0]:
@@ -246,7 +248,7 @@ def generate_data(ids, sliding_window_length, sliding_window_step, data_dir=None
         except:
             print("\n5 In generating data, No created file {}".format(FOLDER_PATH + file_name_data))
         print("-----------------\n{}\n{}\n-----------------".format(file_name_data, file_name_label))
-
+        '''
 
 def generate_CSV(csv_dir, type_file, data_dir):
     '''
