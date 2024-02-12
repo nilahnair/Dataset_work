@@ -193,7 +193,7 @@ def generate_data(ids, sliding_window_length, sliding_window_step, data_dir=None
     hist_classes_all = np.zeros((NUM_CLASSES))
 
     for subject_id in ids:
-        subject_folder = f"db_{ID_2_SUBJECT[subject_id]}{os.sep}" #f"{BASE_DIR}{os.sep}db_release{os.sep}db_10min{os.sep}db_{ID_2_SUBJECT[subject_id]}{os.sep}"
+        subject_folder = f"{BASE_DIR}{os.sep}db_{ID_2_SUBJECT[subject_id]}{os.sep}" #f"{BASE_DIR}{os.sep}db_release{os.sep}db_10min{os.sep}db_{ID_2_SUBJECT[subject_id]}{os.sep}"
         print('subject folder')
         print(subject_folder)
         data_x, labels = read_folder(subject_folder)
@@ -301,22 +301,22 @@ def create_dataset(identity_bool=False):
 
     @param half: set for creating dataset with half the frequence.
     '''
-    train_ids = [0]
-    val_ids = ["S11", "S12"]
-    test_ids = ["S13", "S14"]
+    train_ids = [0,1]
+    #val_ids = ["S11", "S12"]
+    #test_ids = ["S13", "S14"]
 
-    all_data = ["S07", "S08", "S09", "S10", "S11", "S12", "S13", "S14"]
+    #all_data = ["S07", "S08", "S09", "S10", "S11", "S12", "S13", "S14"]
 
    
-    base_directory = '//data/nnair/datasetbias/personid/baseline/prepros/'
+    base_directory = '/data/nnair/datasetbias/personid/baseline/prepros/'
 
     data_dir_train = base_directory + 'sequences_train/'
     data_dir_val = base_directory + 'sequences_val/'
     data_dir_test = base_directory + 'sequences_test/'
 
     generate_data(train_ids, sliding_window_length=200, sliding_window_step=12, data_dir=data_dir_train)
-    generate_data(val_ids, sliding_window_length=200, sliding_window_step=12, data_dir=data_dir_val)
-    generate_data(test_ids, sliding_window_length=200, sliding_window_step=12, data_dir=data_dir_test)
+    #generate_data(val_ids, sliding_window_length=200, sliding_window_step=12, data_dir=data_dir_val)
+    #generate_data(test_ids, sliding_window_length=200, sliding_window_step=12, data_dir=data_dir_test)
 
     generate_CSV(base_directory, "train.csv", data_dir_train)
     generate_CSV(base_directory, "val.csv", data_dir_val)
